@@ -1,5 +1,5 @@
 {
-  "extends": "@gaqno-dev/frontcore/config/typescript",
+  "extends": "@gaqno-dev/frontcore/config/tsconfig.base.json",
   "compilerOptions": {
     "plugins": [
       {
@@ -10,7 +10,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "skipLibCheck": true
   },
   "include": [
     "next-env.d.ts",
