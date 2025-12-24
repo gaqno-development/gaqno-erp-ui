@@ -19,7 +19,26 @@ export default defineConfig({
 			exposes: {
 				'./App': './src/App.tsx',
 			},
-			shared: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
+			shared: {
+				react: {
+					singleton: true,
+					requiredVersion: '^18.0.0',
+					eager: true,
+				},
+				'react-dom': {
+					singleton: true,
+					requiredVersion: '^18.0.0',
+					eager: true,
+				},
+				'react-router-dom': {
+					singleton: true,
+					requiredVersion: '^6.0.0',
+				},
+				'@tanstack/react-query': {
+					singleton: true,
+					requiredVersion: '^5.0.0',
+				},
+			},
 		}),
 	],
 	build: {
