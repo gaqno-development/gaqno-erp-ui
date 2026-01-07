@@ -3,7 +3,7 @@ import {
   QueryProvider,
   AuthProvider,
   TenantProvider
-} from "@gaqno-dev/frontcore"
+} from "@gaqno-development/frontcore"
 
 function ERPPage() {
   return (
