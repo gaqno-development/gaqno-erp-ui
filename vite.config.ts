@@ -46,6 +46,10 @@ export default defineConfig(async () => {
 					singleton: true,
 					requiredVersion: '^4.0.0',
 				},
+				'use-sync-external-store': {
+					singleton: true,
+					requiredVersion: '*',
+				},
 			} as any,
 		}),
 	],
@@ -54,6 +58,12 @@ export default defineConfig(async () => {
 		target: 'esnext',
 		minify: false,
 		cssCodeSplit: false,
+		commonjsOptions: {
+			transformMixedEsModules: true,
+			requireReturnsDefault: 'preferred',
+		},
+		rollupOptions: { output: { format: 'es' } },
 	},
+	optimizeDeps: { include: ['use-sync-external-store'] },
 	}
 })
