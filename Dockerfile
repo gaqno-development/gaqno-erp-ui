@@ -8,8 +8,8 @@ COPY package.json ./
 COPY .npmrc* ./
 ARG NPM_TOKEN
 RUN if [ -n "$NPM_TOKEN" ]; then \
-  printf '%s\n' "@gaqno-development:registry=https://npm.pkg.github.com" "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > .npmrc; \
-fi
+    printf '%s\n' "@gaqno-development:registry=https://npm.pkg.github.com" "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > .npmrc; \
+    fi
 RUN --mount=type=cache,target=/root/.npm \
     npm config set fetch-timeout 1200000 && \
     npm config set fetch-retries 10 && \
@@ -34,14 +34,21 @@ RUN echo 'server { \
     server_name _; \
     root /usr/share/nginx/html; \
     index index.html; \
+    location /erp/ { \
+    alias /usr/share/nginx/html/; \
+    try_files $uri $uri/ /erp/index.html; \
+    add_header Access-Control-Allow-Origin "*"; \
+    add_header Cache-Control "public, immutable"; \
+    } \
     location / { \
-        try_files $uri $uri/ /index.html; \
+    try_files $uri $uri/ /index.html; \
     } \
     location /assets { \
-        expires 1y; \
-        add_header Cache-Control "public, immutable"; \
+    expires 1y; \
+    add_header Cache-Control "public, immutable"; \
+    add_header Access-Control-Allow-Origin "*"; \
     } \
-}' > /etc/nginx/conf.d/default.conf
+    }' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 3005
 CMD ["nginx", "-g", "daemon off;"]
