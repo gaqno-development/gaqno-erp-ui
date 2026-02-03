@@ -31,7 +31,7 @@ COPY --from=builder /app/public /usr/share/nginx/html/public
 RUN echo 'server { listen 3004; server_name _; root /usr/share/nginx/html; index index.html; \
     location /erp/assets/ { alias /usr/share/nginx/html/assets/; add_header Cache-Control "public, immutable"; add_header Access-Control-Allow-Origin "*"; } \
     location /assets/ { alias /usr/share/nginx/html/assets/; add_header Cache-Control "public, immutable"; add_header Access-Control-Allow-Origin "*"; } \
-    location / { return 302 /dashboard; } }' > /etc/nginx/conf.d/default.conf
+    location / { return 302 /; } }' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 3004
 CMD ["nginx", "-g", "daemon off;"]
