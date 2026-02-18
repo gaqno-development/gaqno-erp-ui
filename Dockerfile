@@ -20,6 +20,7 @@ COPY . .
 RUN mkdir -p public
 # PATCH: Fix unused @ts-expect-error in @gaqno-development/frontcore
 RUN find node_modules -name useDialogForm.ts -exec sed -i '/@ts-expect-error/d' {} +
+ENV NODE_ENV=production
 RUN npm run build
 
 FROM nginx:alpine AS runner
