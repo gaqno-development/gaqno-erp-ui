@@ -31,13 +31,13 @@ function ERPLayout({ children }: { children: React.ReactNode }) {
             <TabsList>
               <TabsTrigger value="catalog" asChild>
                 <Link to="/erp/catalog">
-                  <Package className="h-4 w-4 mr-2" />
+                  <Package className="h-4 w-4" />
                   Catalog
                 </Link>
               </TabsTrigger>
               <TabsTrigger value="ai-content" asChild>
                 <Link to="/erp/ai-content">
-                  <Sparkles className="h-4 w-4 mr-2" />
+                  <Sparkles className="h-4 w-4" />
                   AI Content
                 </Link>
               </TabsTrigger>
