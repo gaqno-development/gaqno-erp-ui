@@ -20,7 +20,7 @@ import {
 } from "@gaqno-development/frontcore/components/ai";
 import { useErpProducts } from "@gaqno-development/frontcore/hooks/ai";
 import type { GenerateContentProductInput } from "@gaqno-development/frontcore/utils/api";
-import { ChevronLeft, FileText, Film } from "lucide-react";
+import { ChevronLeft, FileText, Film, Pencil } from "lucide-react";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -82,6 +82,12 @@ export default function ProductDetailPage() {
           </p>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" asChild>
+            <Link to={`/erp/catalog/${id}/edit`}>
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit product
+            </Link>
+          </Button>
           <Button size="sm" onClick={() => setContentSheetOpen(true)}>
             <FileText className="h-4 w-4 mr-2" />
             Generate marketing content

@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import path from "path";
 import react from "@vitejs/plugin-react";
 import federation from "@originjs/vite-plugin-federation";
 
@@ -9,6 +10,9 @@ export default defineConfig(async () => {
 
   return {
     base,
+    resolve: {
+      alias: { "@": path.resolve(__dirname, "./src") },
+    },
     server: {
       port: 3004,
       origin: "http://localhost:3004",
