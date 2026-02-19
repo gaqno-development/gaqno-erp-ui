@@ -120,7 +120,7 @@ export default function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          <Button asChild size="sm">
+          <Button variant="default" asChild size="sm">
             <Link to="/erp/catalog">
               <Package className="h-4 w-4 mr-2" />
               Catalog

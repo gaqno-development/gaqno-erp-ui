@@ -38,7 +38,7 @@ export default function CatalogPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold">Product catalog</h2>
-        <Button asChild size="sm">
+        <Button variant="default" asChild size="sm">
           <Link to="/erp/catalog/new">
             <Plus className="h-4 w-4 mr-2" />
             New product

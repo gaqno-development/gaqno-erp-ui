@@ -88,7 +88,7 @@ export default function ProductDetailPage() {
               Edit product
             </Link>
           </Button>
-          <Button size="sm" onClick={() => setContentSheetOpen(true)}>
+          <Button variant="default" size="sm" onClick={() => setContentSheetOpen(true)}>
             <FileText className="h-4 w-4 mr-2" />
             Generate marketing content
           </Button>
