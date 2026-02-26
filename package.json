@@ -10,11 +10,13 @@
     "preview": "vite preview --port 3005 --host 0.0.0.0",
     "start": "vite preview --port 3005 --host 0.0.0.0",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "echo \"No tests\""
+    "test": "vitest --run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --run --coverage"
   },
   "dependencies": {
-    "@gaqno-development/types": "^1.0.0",
     "@gaqno-development/frontcore": "^1.0.68",
+    "@gaqno-development/types": "^1.0.0",
     "@hookform/resolvers": "^3.10.0",
     "@tanstack/react-query": "^5.90.12",
     "react": "^18",
@@ -24,14 +26,21 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
     "@module-federation/vite": "^1.0.0",
     "@originjs/vite-plugin-federation": "^1.4.1",
     "@tailwindcss/vite": "^4.1.18",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^14.3.1",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^2.1.6",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.57.0",
+    "husky": "^9.1.7",
+    "jsdom": "^25.0.1",
     "nodemon": "^3.1.11",
     "postcss": "^8.4.32",
     "tailwind-scrollbar": "^4.0.2",
@@ -40,9 +49,7 @@
     "typescript": "5.9.3",
     "vite": "^5.4.0",
     "vite-plugin-top-level-await": "^1.6.0",
-    "husky": "^9.1.7",
-    "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0"
+    "vitest": "^2.1.6"
   },
   "overrides": {
     "@gaqno-development/core": "npm:@gaqno-development/frontcore@^1.0.68"

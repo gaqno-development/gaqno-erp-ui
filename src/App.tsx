@@ -50,31 +50,31 @@ function ERPLayout({ children }: { children: React.ReactNode }) {
               <TabsTrigger value="dashboard" asChild>
                 <Link to="/erp/dashboard">
                   <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
+                  Painel
                 </Link>
               </TabsTrigger>
               <TabsTrigger value="catalog" asChild>
                 <Link to="/erp/catalog">
                   <Package className="h-4 w-4" />
-                  Catalog
+                  Catálogo
                 </Link>
               </TabsTrigger>
               <TabsTrigger value="orders" asChild>
                 <Link to="/erp/orders">
                   <ShoppingCart className="h-4 w-4" />
-                  Orders
+                  Pedidos
                 </Link>
               </TabsTrigger>
               <TabsTrigger value="inventory" asChild>
                 <Link to="/erp/inventory">
                   <Warehouse className="h-4 w-4" />
-                  Inventory
+                  Estoque
                 </Link>
               </TabsTrigger>
               <TabsTrigger value="ai-content" asChild>
                 <Link to="/erp/ai-content">
                   <Sparkles className="h-4 w-4" />
-                  AI Content
+                  Conteúdo de IA
                 </Link>
               </TabsTrigger>
             </TabsList>

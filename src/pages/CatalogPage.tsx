@@ -1,12 +1,7 @@
 "use client";
 
 import { Link } from "react-router-dom";
-import { useErpProducts } from "@gaqno-development/frontcore/hooks/ai";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
   Button,
   Input,
   Select,
@@ -14,10 +9,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Checkbox,
 } from "@gaqno-development/frontcore/components/ui";
-import { useFilteredCatalog } from "@/hooks/useFilteredCatalog";
+import { useErpProducts } from "@gaqno-development/frontcore/hooks/erp";
+import { useFilteredCatalog } from "../hooks/useFilteredCatalog";
 import { Plus, Search } from "lucide-react";
+import { ProductCard } from "../components/ProductCard";
 
 export default function CatalogPage() {
   const productsQuery = useErpProducts({ limit: 200 });
@@ -27,41 +23,40 @@ export default function CatalogPage() {
     setSearch,
     categoryFilter,
     setCategoryFilter,
-    lowStockOnly,
-    setLowStockOnly,
     categories,
     filteredProducts,
-    clearFilters,
   } = useFilteredCatalog({ products });
+
+  const isLoading = productsQuery.isLoading;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-lg font-semibold">Product catalog</h2>
-        <Button variant="default" asChild size="sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-lg font-semibold">Catálogo de Produtos</h2>
+        <Button asChild>
           <Link to="/erp/catalog/new">
             <Plus className="h-4 w-4 mr-2" />
-            New product
+            Novo Produto
           </Link>
         </Button>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name, SKU, category…"
+            placeholder="Buscar produtos..."
+            className="pl-9"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
           />
         </div>
         <Select value={categoryFilter || "all"} onValueChange={(v) => setCategoryFilter(v === "all" ? "" : v)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Category" />
+          <SelectTrigger className="w-full sm:w-[200px]">
+            <SelectValue placeholder="Todas as categorias" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
+            <SelectItem value="all">Todas as categorias</SelectItem>
             {categories.map((c) => (
               <SelectItem key={c} value={c}>
                 {c}
@@ -69,46 +64,29 @@ export default function CatalogPage() {
             ))}
           </SelectContent>
         </Select>
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
-          <Checkbox
-            checked={lowStockOnly}
-            onCheckedChange={(checked) => setLowStockOnly(checked === true)}
-          />
-          Low stock only
-        </label>
-        {(search || categoryFilter || lowStockOnly) && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Clear filters
-          </Button>
-        )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {productsQuery.isLoading && (
-          <p className="text-muted-foreground">Loading…</p>
-        )}
-        {!productsQuery.isLoading && filteredProducts.length === 0 && (
-          <p className="text-muted-foreground col-span-full">
-            No products match the filters.
-          </p>
-        )}
-        {filteredProducts.map((p) => (
-          <Card key={p.id}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">{p.name}</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {p.price} · {p.category ?? "—"}
-                {typeof p.stock === "number" ? ` · Stock: ${p.stock}` : ""}
-              </p>
-            </CardHeader>
-            <CardContent>
-              <Button asChild size="sm">
-                <Link to={`/erp/catalog/${p.id}`}>View & AI actions</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-32 rounded-xl bg-muted animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredProducts.map((p) => (
+              <ProductCard key={p.id} product={p as any} />
+            ))}
+          </div>
+
+          {!isLoading && filteredProducts.length === 0 && (
+            <div className="text-center py-12 border rounded-xl bg-muted/20">
+              <p className="text-muted-foreground">Nenhum produto encontrado.</p>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

@@ -18,8 +18,8 @@ import {
   AIContentGenerator,
   AIVideoGenerator,
 } from "@gaqno-development/frontcore/components/ai";
-import { useErpProducts } from "@gaqno-development/frontcore/hooks/ai";
-import type { GenerateContentProductInput } from "@gaqno-development/frontcore/utils/api";
+import { useErpProducts } from "@gaqno-development/frontcore/hooks/erp";
+import type { ErpProduct } from "@gaqno-development/types";
 import { ChevronLeft, FileText, Film, Pencil } from "lucide-react";
 
 export default function ProductDetailPage() {
@@ -29,7 +29,7 @@ export default function ProductDetailPage() {
 
   const productsQuery = useErpProducts({ limit: 100 });
   const products = productsQuery.data ?? [];
-  const found = id ? products.find((p) => p.id === id) : undefined;
+  const found = id ? products.find((p: any) => p.id === id) : undefined;
   const product = found ?? null;
 
   const productForProfile = product
@@ -46,8 +46,7 @@ export default function ProductDetailPage() {
       }
     : null;
 
-  const productForContent: GenerateContentProductInput | null =
-    productForProfile;
+  const productForContent: any = productForProfile;
 
   if (productsQuery.isLoading || !product) {
     return (
@@ -55,11 +54,11 @@ export default function ProductDetailPage() {
         <Button variant="ghost" size="sm" asChild>
           <Link to="/erp/catalog">
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Back to catalog
+            Voltar para o catálogo
           </Link>
         </Button>
         <p className="text-muted-foreground">
-          {productsQuery.isLoading ? "Loading…" : "Product not found."}
+          {productsQuery.isLoading ? "Carregando…" : "Produto não encontrado."}
         </p>
       </div>
     );
@@ -70,7 +69,7 @@ export default function ProductDetailPage() {
       <Button variant="ghost" size="sm" asChild>
         <Link to="/erp/catalog">
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Back to catalog
+          Voltar para o catálogo
         </Link>
       </Button>
 
@@ -78,19 +77,19 @@ export default function ProductDetailPage() {
         <CardHeader>
           <CardTitle>{product.name}</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Price: {product.price} · Category: {product.category ?? "—"}
+            Preço: {product.price} · Categoria: {product.category ?? "—"}
           </p>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" asChild>
             <Link to={`/erp/catalog/${id}/edit`}>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit product
+              Editar produto
             </Link>
           </Button>
           <Button variant="default" size="sm" onClick={() => setContentSheetOpen(true)}>
             <FileText className="h-4 w-4 mr-2" />
-            Generate marketing content
+            Gerar conteúdo de marketing
           </Button>
           <Button
             size="sm"
@@ -98,20 +97,20 @@ export default function ProductDetailPage() {
             onClick={() => setVideoSheetOpen(true)}
           >
             <Film className="h-4 w-4 mr-2" />
-            Create video
+            Criar vídeo
           </Button>
         </CardContent>
       </Card>
 
       <AIProductProfileBuilder
         initialData={productForProfile}
-        title="AI product profile"
+        title="Perfil de produto com IA"
       />
 
       <Sheet open={contentSheetOpen} onOpenChange={setContentSheetOpen}>
         <SheetContent className="overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Generate marketing content</SheetTitle>
+            <SheetTitle>Gerar conteúdo de marketing</SheetTitle>
           </SheetHeader>
           <div className="mt-4">
             <AIContentGenerator
@@ -126,7 +125,7 @@ export default function ProductDetailPage() {
       <Sheet open={videoSheetOpen} onOpenChange={setVideoSheetOpen}>
         <SheetContent className="overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Create product video</SheetTitle>
+            <SheetTitle>Criar vídeo do produto</SheetTitle>
           </SheetHeader>
           <div className="mt-4">
             <AIVideoGenerator

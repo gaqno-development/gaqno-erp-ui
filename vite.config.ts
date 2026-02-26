@@ -28,6 +28,11 @@ export default defineConfig(async () => {
         filename: "remoteEntry.js",
         exposes: {
           "./App": "./src/App.tsx",
+          "./DashboardPage": "./src/pages/DashboardPage.tsx",
+          "./CatalogPage": "./src/pages/CatalogPage.tsx",
+          "./InventoryPage": "./src/pages/InventoryPage.tsx",
+          "./OrdersListPage": "./src/pages/OrdersListPage.tsx",
+          "./AIContentPage": "./src/pages/AIContentPage.tsx",
         },
         shared: {
           react: {

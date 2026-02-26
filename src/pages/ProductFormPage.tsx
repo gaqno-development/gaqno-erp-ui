@@ -20,23 +20,23 @@ export default function ProductFormPage() {
       <Button variant="ghost" size="sm" asChild>
         <Link to={isEdit ? `/erp/catalog/${id}` : "/erp/catalog"}>
           <ChevronLeft className="h-4 w-4 mr-1" />
-          {isEdit ? "Back to product" : "Back to catalog"}
+          {isEdit ? "Voltar para o produto" : "Voltar para o catálogo"}
         </Link>
       </Button>
       <Card>
         <CardHeader>
-          <CardTitle>{isEdit ? "Edit product" : "New product"}</CardTitle>
+          <CardTitle>{isEdit ? "Editar produto" : "Novo produto"}</CardTitle>
           <CardDescription>
-            Product create and edit will be available when a product API (ERP or
-            PDV) is connected. Use Catalog to view products and Product detail
-            for AI actions.
+            A criação e edição de produtos estarão disponíveis quando uma API de produto (ERP ou
+            PDV) for conectada. Use o Catálogo para ver produtos e o Detalhe do Produto
+            para ações de IA.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
             {isEdit
-              ? `Editing product id: ${id}. Form fields will be wired to the API when the backend is ready.`
-              : "Create form will appear here once the product create API is available."}
+              ? `Editando produto id: ${id}. Os campos do formulário serão conectados à API quando o backend estiver pronto.`
+              : "O formulário de criação aparecerá aqui assim que a API de criação de produto estiver disponível."}
           </p>
         </CardContent>
       </Card>

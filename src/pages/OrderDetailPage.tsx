@@ -18,16 +18,16 @@ export default function OrderDetailPage() {
       <Button variant="ghost" size="sm" asChild>
         <Link to="/erp/orders">
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Back to orders
+          Voltar para pedidos
         </Link>
       </Button>
       <Card>
         <CardHeader>
-          <CardTitle>Order {id ?? "—"}</CardTitle>
+          <CardTitle>Pedido {id ?? "—"}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Order detail will appear here when the order API is available.
+            Os detalhes do pedido aparecerão aqui quando a API de pedidos estiver disponível.
           </p>
         </CardContent>
       </Card>
