@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@gaqno-development/frontcore/components/ui";
-import { useERPKPIs } from "@gaqno-development/frontcore/hooks/erp";
+import { useERPKPIs } from "@gaqno-development/frontcore";
 import { ShoppingCart, Package, Warehouse, TrendingUp } from "lucide-react";
 import { QuickLinksCard } from "../components/QuickLinksCard";
 

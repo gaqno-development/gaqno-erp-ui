@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import { render } from "@/test/test-utils";
+import { useERPKPIs as mockUseERPKPIs } from "@/__mocks__/frontcore";
 import DashboardPage from "./DashboardPage";
 
 vi.mock("@gaqno-development/frontcore", async () => {
@@ -12,11 +13,6 @@ vi.mock("@gaqno-development/frontcore/components/ui", async () => {
   const mock = await import("@/__mocks__/frontcore");
   return mock.components.ui;
 });
-
-const mockUseERPKPIs = vi.fn();
-vi.mock("@gaqno-development/frontcore/hooks/erp", () => ({
-  useERPKPIs: (...args: unknown[]) => mockUseERPKPIs(...args),
-}));
 
 describe("DashboardPage", () => {
   beforeEach(() => {

@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@gaqno-development/frontcore/components/ui";
-import { useErpProducts } from "@gaqno-development/frontcore/hooks/erp";
+import { useErpProducts } from "@gaqno-development/frontcore";
 import { useFilteredCatalog } from "../hooks/useFilteredCatalog";
 import { Plus, Search } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";

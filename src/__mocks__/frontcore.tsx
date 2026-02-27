@@ -1,4 +1,15 @@
 import React from "react";
+import { vi } from "vitest";
+
+export const useERPKPIs = vi.fn(() => ({
+  stats: { totalProducts: 0, lowStockCount: 0 },
+  isLoading: false,
+}));
+export const useErpProducts = vi.fn(() => ({ data: [], isLoading: false }));
+export const useERPInventory = vi.fn(() => ({
+  inventory: { withStock: [], lowStock: [] },
+  isLoading: false,
+}));
 
 const Div = ({ children, ...props }: { children?: React.ReactNode; [k: string]: unknown }) => (
   <div {...props}>{children}</div>

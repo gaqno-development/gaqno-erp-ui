@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import { render } from "@/test/test-utils";
+import { useErpProducts as mockUseErpProducts } from "@/__mocks__/frontcore";
 import ProductDetailPage from "./ProductDetailPage";
 
 vi.mock("@gaqno-development/frontcore", async () => {
@@ -21,11 +22,6 @@ vi.mock("@gaqno-development/frontcore/components/ai", async () => {
     AIVideoGenerator: mock.AIVideoGenerator,
   };
 });
-
-const mockUseErpProducts = vi.fn();
-vi.mock("@gaqno-development/frontcore/hooks/erp", () => ({
-  useErpProducts: (...args: unknown[]) => mockUseErpProducts(...args),
-}));
 
 describe("ProductDetailPage", () => {
   beforeEach(() => {

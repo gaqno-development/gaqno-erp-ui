@@ -10,7 +10,7 @@ import {
   DataTable,
   ColumnDef,
 } from "@gaqno-development/frontcore/components/ui";
-import { useERPInventory } from "@gaqno-development/frontcore/hooks/erp";
+import { useERPInventory } from "@gaqno-development/frontcore";
 import { LowStockAlert } from "../components/LowStockAlert";
 
 export default function InventoryPage() {

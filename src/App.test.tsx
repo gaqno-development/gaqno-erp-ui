@@ -13,11 +13,6 @@ vi.mock("@gaqno-development/frontcore/components/ui", async () => {
   return mock.components.ui;
 });
 
-vi.mock("@gaqno-development/frontcore/hooks/erp", () => ({
-  useErpProducts: vi.fn(() => ({ data: [], isLoading: false })),
-  useERPKPIs: vi.fn(() => ({ stats: { totalProducts: 0, lowStockCount: 0 }, isLoading: false })),
-  useERPInventory: vi.fn(() => ({ inventory: { withStock: [], lowStock: [] }, isLoading: false })),
-}));
 vi.mock("@gaqno-development/frontcore/hooks/ai", () => ({
   useBillingSummary: vi.fn(() => ({ data: null, isLoading: false })),
 }));

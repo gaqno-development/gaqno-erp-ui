@@ -18,7 +18,7 @@ import {
   AIContentGenerator,
   AIVideoGenerator,
 } from "@gaqno-development/frontcore/components/ai";
-import { useErpProducts } from "@gaqno-development/frontcore/hooks/erp";
+import { useErpProducts } from "@gaqno-development/frontcore";
 import type { ErpProduct } from "@gaqno-development/types";
 import { ChevronLeft, FileText, Film, Pencil } from "lucide-react";
 
