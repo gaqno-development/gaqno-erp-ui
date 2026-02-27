@@ -74,4 +74,28 @@ describe("useFilteredCatalog", () => {
     expect(result.current.lowStockOnly).toBe(false);
     expect(result.current.filteredProducts).toHaveLength(1);
   });
+
+  it("should filter by SKU when search matches", () => {
+    const products = [
+      makeProduct({ id: "1", name: "Widget", sku: "SKU-001" }),
+      makeProduct({ id: "2", name: "Gadget", sku: "SKU-002" }),
+    ];
+    const { result } = renderHook(() => useFilteredCatalog({ products }));
+
+    act(() => result.current.setSearch("SKU-002"));
+    expect(result.current.filteredProducts).toHaveLength(1);
+    expect(result.current.filteredProducts[0].sku).toBe("SKU-002");
+  });
+
+  it("should include products with stock at threshold (10) when lowStockOnly is true", () => {
+    const products = [
+      makeProduct({ id: "1", stock: 10 }),
+      makeProduct({ id: "2", stock: 11 }),
+    ];
+    const { result } = renderHook(() => useFilteredCatalog({ products }));
+
+    act(() => result.current.setLowStockOnly(true));
+    expect(result.current.filteredProducts).toHaveLength(1);
+    expect(result.current.filteredProducts[0].stock).toBe(10);
+  });
 });
