@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
   Input,
@@ -13,10 +13,14 @@ import {
 import { useErpProducts } from "@gaqno-development/frontcore";
 import { useFilteredCatalog } from "../hooks/useFilteredCatalog";
 import { Plus, Search, Package } from "lucide-react";
-import { ProductCard } from "../components/ProductCard";
-import { LoadingSkeleton, EmptyState } from "../components/shared";
+import {
+  LoadingSkeleton,
+  EmptyState,
+  ProductCard,
+} from "@gaqno-development/frontcore/components/ui";
 
 export default function CatalogPage() {
+  const navigate = useNavigate();
   const productsQuery = useErpProducts({ limit: 200 });
   const products = productsQuery.data ?? [];
   const {
@@ -87,7 +91,7 @@ export default function CatalogPage() {
             !search && !categoryFilter
               ? {
                   label: "Adicionar Produto",
-                  onClick: () => (window.location.href = "/erp/catalog/new"),
+                  onClick: () => navigate("/erp/catalog/new"),
                 }
               : undefined
           }
@@ -95,7 +99,7 @@ export default function CatalogPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProducts.map((p) => (
-            <ProductCard key={p.id} product={p as any} />
+            <ProductCard key={p.id} product={p} to={`/erp/catalog/${p.id}`} />
           ))}
         </div>
       )}

@@ -71,6 +71,40 @@ export const DataTable = ({ data, columns }: { data?: { data?: unknown[] }; colu
   );
 };
 
+const StatCard = ({ title, value, description }: Record<string, unknown>) => (
+  <div data-testid="stat-card">
+    <span>{title}</span>
+    <span>{value}</span>
+    {description != null && <span>{String(description)}</span>}
+  </div>
+);
+const QuickLinksCard = ({
+  title,
+  links = [],
+}: {
+  title?: string;
+  links?: Array<{ to: string; label: string }>;
+}) => (
+  <div data-testid="quick-links-card">
+    {title}
+    {links.map((l) => (
+      <a key={l.to} href={l.to}>
+        {l.label}
+      </a>
+    ))}
+  </div>
+);
+const ProductCard = ({ product, ...props }: Record<string, unknown> & { product?: { name?: string } }) => (
+  <div data-testid="product-card" {...props}>
+    {product?.name}
+  </div>
+);
+const EmptyState = ({ title, description }: { title?: string; description?: React.ReactNode }) => (
+  <div data-testid="empty-state">{title}{description}</div>
+);
+const LoadingSkeleton = (props: Record<string, unknown>) => <div data-testid="loading-skeleton" {...props} />;
+const ErrorBoundary = ({ children }: { children?: React.ReactNode }) => <>{children}</>;
+
 export const components = {
   ui: {
     Card: Div,
@@ -95,6 +129,12 @@ export const components = {
     SheetHeader,
     SheetTitle,
     DataTable,
+    StatCard,
+    QuickLinksCard,
+    ProductCard,
+    EmptyState,
+    LoadingSkeleton,
+    ErrorBoundary,
   },
 };
 

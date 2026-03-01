@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { ErrorBoundary } from "./ErrorBoundary";
+import { ErrorBoundary } from "@gaqno-development/frontcore/components/ui";
 
 // Component that throws an error
 const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {

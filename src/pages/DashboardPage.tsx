@@ -6,11 +6,18 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  StatCard,
+  QuickLinksCard,
 } from "@gaqno-development/frontcore/components/ui";
 import { useDashboardStats } from "../hooks/useDashboardStats";
-import { ShoppingCart, Package, Warehouse, TrendingUp } from "lucide-react";
-import { QuickLinksCard } from "../components/QuickLinksCard";
-import { StatCard } from "../components/shared";
+import {
+  ShoppingCart,
+  Package,
+  Warehouse,
+  TrendingUp,
+  Sparkles,
+  LayoutDashboard,
+} from "lucide-react";
 
 export default function DashboardPage() {
   const { statCards, isLoading } = useDashboardStats();
@@ -48,7 +55,17 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <QuickLinksCard />
+      <QuickLinksCard
+        title="Links rápidos"
+        titleIcon={LayoutDashboard}
+        description="Ir para catálogo, pedidos, estoque ou conteúdo de IA"
+        links={[
+          { to: "/erp/catalog", label: "Catálogo", icon: Package, variant: "default" },
+          { to: "/erp/orders", label: "Pedidos", icon: ShoppingCart },
+          { to: "/erp/inventory", label: "Estoque", icon: Warehouse },
+          { to: "/erp/ai-content", label: "Conteúdo de IA", icon: Sparkles },
+        ]}
+      />
 
       <Card>
         <CardHeader>
