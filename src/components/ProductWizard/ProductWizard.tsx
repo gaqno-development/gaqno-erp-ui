@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,9 +9,21 @@ import {
   Progress,
   Input,
   Label,
-} from '@gaqno-development/frontcore/components/ui';
-import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
-import { useProductWizard, type ProductData } from '../../hooks/useProductWizard';
+  Badge,
+} from "@gaqno-development/frontcore/components/ui";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  X,
+  Sparkles,
+  RefreshCw,
+} from "lucide-react";
+import {
+  useProductWizard,
+  type ProductData,
+} from "../../hooks/useProductWizard";
+import { useProductAISuggestions } from "../../hooks/useProductAISuggestions";
 
 export interface ProductWizardProps {
   onComplete: (productData: ProductData) => void;
@@ -19,7 +31,11 @@ export interface ProductWizardProps {
   open?: boolean;
 }
 
-export function ProductWizard({ onComplete, onCancel, open = true }: ProductWizardProps) {
+export function ProductWizard({
+  onComplete,
+  onCancel,
+  open = true,
+}: ProductWizardProps) {
   const {
     currentStep,
     totalSteps,
@@ -31,8 +47,22 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
     previousStep,
     getProgress,
     finish,
-    getStepTitle
+    getStepTitle,
   } = useProductWizard({ onComplete });
+
+  const {
+    generateSuggestions,
+    suggestions,
+    isLoading: isAILoading,
+    error: aiError,
+    clearSuggestions,
+    applySuggestion,
+    generateMarketingCopy,
+    marketingCopy,
+    isGeneratingCopy,
+    copyError,
+    applyMarketingCopy,
+  } = useProductAISuggestions(setProductData);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -68,8 +98,10 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                   step="0.01"
                   min="0.01"
                   placeholder="Preço"
-                  value={productData.price || ''}
-                  onChange={(e) => setProductData({ price: parseFloat(e.target.value) || 0 })}
+                  value={productData.price || ""}
+                  onChange={(e) =>
+                    setProductData({ price: parseFloat(e.target.value) || 0 })
+                  }
                   disabled={isCreating}
                 />
               </div>
@@ -80,8 +112,10 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                   type="number"
                   min="0"
                   placeholder="Estoque inicial"
-                  value={productData.stock || ''}
-                  onChange={(e) => setProductData({ stock: parseInt(e.target.value) || 0 })}
+                  value={productData.stock || ""}
+                  onChange={(e) =>
+                    setProductData({ stock: parseInt(e.target.value) || 0 })
+                  }
                   disabled={isCreating}
                 />
               </div>
@@ -92,6 +126,38 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
       case 2:
         return (
           <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Descrição e Categoria</h3>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => generateSuggestions(productData)}
+                disabled={
+                  !productData.name || !productData.price || isAILoading
+                }
+                className="flex items-center gap-2"
+              >
+                {isAILoading ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Sugestões IA
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {aiError && (
+              <div className="p-3 border border-destructive/20 bg-destructive/10 rounded-md">
+                <p className="text-sm text-destructive">{aiError}</p>
+              </div>
+            )}
+
             <div>
               <Label htmlFor="description">Descrição do Produto *</Label>
               <textarea
@@ -99,10 +165,45 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                 className="w-full min-h-[100px] px-3 py-2 border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 placeholder="Descreva o produto..."
                 value={productData.description}
-                onChange={(e) => setProductData({ description: e.target.value })}
+                onChange={(e) =>
+                  setProductData({ description: e.target.value })
+                }
                 disabled={isCreating}
               />
+              {suggestions?.profile.description && (
+                <div className="mt-2 p-2 border border-muted bg-muted/50 rounded-md">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Sugestão IA
+                    </span>
+                    <Badge variant="secondary" className="text-xs">
+                      {Math.round(
+                        suggestions.profile.description.confidence * 100,
+                      )}
+                      % confiança
+                    </Badge>
+                  </div>
+                  <p className="text-sm mb-2">
+                    {suggestions.profile.description.value}
+                  </p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      applySuggestion(
+                        "description",
+                        suggestions.profile.description.value,
+                      )
+                    }
+                    disabled={isCreating}
+                  >
+                    Aplicar sugestão
+                  </Button>
+                </div>
+              )}
             </div>
+
             <div>
               <Label htmlFor="category">Categoria *</Label>
               <Input
@@ -112,6 +213,38 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                 onChange={(e) => setProductData({ category: e.target.value })}
                 disabled={isCreating}
               />
+              {suggestions?.profile.category && (
+                <div className="mt-2 p-2 border border-muted bg-muted/50 rounded-md">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Sugestão IA
+                    </span>
+                    <Badge variant="secondary" className="text-xs">
+                      {Math.round(
+                        suggestions.profile.category.confidence * 100,
+                      )}
+                      % confiança
+                    </Badge>
+                  </div>
+                  <p className="text-sm mb-2">
+                    {suggestions.profile.category.value}
+                  </p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      applySuggestion(
+                        "category",
+                        suggestions.profile.category.value,
+                      )
+                    }
+                    disabled={isCreating}
+                  >
+                    Aplicar sugestão
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -125,7 +258,9 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                 Funcionalidade de upload de imagens será implementada em breve.
               </p>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-                <p className="text-muted-foreground">Arraste imagens aqui ou clique para upload</p>
+                <p className="text-muted-foreground">
+                  Arraste imagens aqui ou clique para upload
+                </p>
               </div>
             </div>
           </div>
@@ -134,6 +269,38 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
       case 4:
         return (
           <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Conteúdo de Marketing</h3>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => generateMarketingCopy(productData)}
+                disabled={
+                  !productData.name || !productData.price || isGeneratingCopy
+                }
+                className="flex items-center gap-2"
+              >
+                {isGeneratingCopy ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Gerar Copy
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {copyError && (
+              <div className="p-3 border border-destructive/20 bg-destructive/10 rounded-md">
+                <p className="text-sm text-destructive">{copyError}</p>
+              </div>
+            )}
+
             <div>
               <Label htmlFor="marketingCopy">Texto de Marketing</Label>
               <textarea
@@ -141,9 +308,50 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                 className="w-full min-h-[100px] px-3 py-2 border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 placeholder="Texto para marketing..."
                 value={productData.marketingCopy}
-                onChange={(e) => setProductData({ marketingCopy: e.target.value })}
+                onChange={(e) =>
+                  setProductData({ marketingCopy: e.target.value })
+                }
                 disabled={isCreating}
               />
+              {marketingCopy && (
+                <div className="mt-2 p-2 border border-muted bg-muted/50 rounded-md">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Sugestão IA
+                    </span>
+                    <Badge variant="secondary" className="text-xs">
+                      AI Generated
+                    </Badge>
+                  </div>
+                  <p className="text-sm mb-2 whitespace-pre-wrap">
+                    {marketingCopy.copy}
+                  </p>
+                  {marketingCopy.assumptions &&
+                    marketingCopy.assumptions.length > 0 && (
+                      <div className="mb-2">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Premissas:
+                        </p>
+                        <ul className="text-xs text-muted-foreground list-disc list-inside">
+                          {marketingCopy.assumptions.map(
+                            (assumption, index) => (
+                              <li key={index}>{assumption}</li>
+                            ),
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={applyMarketingCopy}
+                    disabled={isCreating}
+                  >
+                    Aplicar sugestão
+                  </Button>
+                </div>
+              )}
             </div>
             <div>
               <Label>Palavras-chave</Label>
@@ -163,11 +371,11 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <span className="text-sm font-medium">Nome:</span>
-                    <p className="text-sm">{productData.name || '-'}</p>
+                    <p className="text-sm">{productData.name || "-"}</p>
                   </div>
                   <div>
                     <span className="text-sm font-medium">SKU:</span>
-                    <p className="text-sm">{productData.sku || '-'}</p>
+                    <p className="text-sm">{productData.sku || "-"}</p>
                   </div>
                   <div>
                     <span className="text-sm font-medium">Preço:</span>
@@ -180,11 +388,11 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                 </div>
                 <div>
                   <span className="text-sm font-medium">Descrição:</span>
-                  <p className="text-sm">{productData.description || '-'}</p>
+                  <p className="text-sm">{productData.description || "-"}</p>
                 </div>
                 <div>
                   <span className="text-sm font-medium">Categoria:</span>
-                  <p className="text-sm">{productData.category || '-'}</p>
+                  <p className="text-sm">{productData.category || "-"}</p>
                 </div>
               </div>
             </div>
@@ -219,16 +427,14 @@ export function ProductWizard({ onComplete, onCancel, open = true }: ProductWiza
                 {Math.round(getProgress())}%
               </span>
             </div>
-            <Progress 
-              value={getProgress()} 
-              className="h-2" 
+            <Progress
+              value={getProgress()}
+              className="h-2"
               aria-label="Progresso"
             />
           </div>
 
-          <div className="min-h-[300px]">
-            {renderStep()}
-          </div>
+          <div className="min-h-[300px]">{renderStep()}</div>
 
           <div className="flex items-center justify-between pt-4 border-t">
             <div className="flex gap-2">

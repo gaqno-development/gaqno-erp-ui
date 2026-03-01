@@ -1,16 +1,36 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ProductWizard } from "./ProductWizard";
+
+// Mock AI API client
+vi.mock("@gaqno-development/frontcore", () => ({
+  aiApiClient: {
+    buildProductProfile: vi.fn(),
+  },
+}));
 
 describe("ProductWizard", () => {
   const mockOnComplete = vi.fn();
   const mockOnCancel = vi.fn();
+  let queryClient: QueryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        mutations: {
+          retry: false,
+        },
+      },
+    });
   });
 
   const renderProductWizard = (props = {}) => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+
     return render(
       <ProductWizard
         onComplete={mockOnComplete}
@@ -18,6 +38,7 @@ describe("ProductWizard", () => {
         open={true}
         {...props}
       />,
+      { wrapper },
     );
   };
 
