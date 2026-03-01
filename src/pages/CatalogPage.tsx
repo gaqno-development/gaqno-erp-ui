@@ -12,8 +12,9 @@ import {
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpProducts } from "@gaqno-development/frontcore";
 import { useFilteredCatalog } from "../hooks/useFilteredCatalog";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Package } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
+import { LoadingSkeleton, EmptyState } from "../components/shared";
 
 export default function CatalogPage() {
   const productsQuery = useErpProducts({ limit: 200 });
@@ -51,7 +52,10 @@ export default function CatalogPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Select value={categoryFilter || "all"} onValueChange={(v) => setCategoryFilter(v === "all" ? "" : v)}>
+        <Select
+          value={categoryFilter || "all"}
+          onValueChange={(v) => setCategoryFilter(v === "all" ? "" : v)}
+        >
           <SelectTrigger className="w-full sm:w-[200px]">
             <SelectValue placeholder="Todas as categorias" />
           </SelectTrigger>
@@ -68,24 +72,32 @@ export default function CatalogPage() {
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-32 rounded-xl bg-muted animate-pulse" />
+          <LoadingSkeleton count={6} variant="card" />
+        </div>
+      ) : filteredProducts.length === 0 ? (
+        <EmptyState
+          title="Nenhum produto encontrado"
+          description={
+            search || categoryFilter
+              ? "Tente ajustar sua busca ou filtros para encontrar produtos."
+              : "Comece adicionando seu primeiro produto ao catálogo."
+          }
+          icon={Package}
+          action={
+            !search && !categoryFilter
+              ? {
+                  label: "Adicionar Produto",
+                  onClick: () => (window.location.href = "/erp/catalog/new"),
+                }
+              : undefined
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredProducts.map((p) => (
+            <ProductCard key={p.id} product={p as any} />
           ))}
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredProducts.map((p) => (
-              <ProductCard key={p.id} product={p as any} />
-            ))}
-          </div>
-
-          {!isLoading && filteredProducts.length === 0 && (
-            <div className="text-center py-12 border rounded-xl bg-muted/20">
-              <p className="text-muted-foreground">Nenhum produto encontrado.</p>
-            </div>
-          )}
-        </>
       )}
     </div>
   );
