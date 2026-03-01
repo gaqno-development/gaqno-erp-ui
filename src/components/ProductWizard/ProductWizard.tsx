@@ -18,6 +18,7 @@ import {
   X,
   Sparkles,
   RefreshCw,
+  Image,
 } from "lucide-react";
 import {
   useProductWizard,
@@ -62,6 +63,10 @@ export function ProductWizard({
     isGeneratingCopy,
     copyError,
     applyMarketingCopy,
+    generateProductImage,
+    imageGeneration,
+    isGeneratingImage,
+    imageError,
   } = useProductAISuggestions(setProductData);
 
   const renderStep = () => {
@@ -252,10 +257,68 @@ export function ProductWizard({
       case 3:
         return (
           <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Imagens do Produto</h3>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => generateProductImage(productData)}
+                disabled={!productData.name || isGeneratingImage}
+                className="flex items-center gap-2"
+              >
+                {isGeneratingImage ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <Image className="w-4 h-4" />
+                    Gerar Imagem
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {imageError && (
+              <div className="p-3 border border-destructive/20 bg-destructive/10 rounded-md">
+                <p className="text-sm text-destructive">{imageError}</p>
+              </div>
+            )}
+
+            {imageGeneration && (
+              <div className="p-3 border border-muted bg-muted/50 rounded-md">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Tarefa de Geração</span>
+                  <Badge variant="secondary" className="text-xs">
+                    {imageGeneration.status}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  ID da Tarefa: {imageGeneration.taskId}
+                </p>
+                {imageGeneration.estimatedTime && (
+                  <p className="text-xs text-muted-foreground">
+                    Tempo estimado: {imageGeneration.estimatedTime}s
+                  </p>
+                )}
+                <div className="mt-2">
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full animate-pulse w-1/3"></div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Processando geração de imagem...
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div>
-              <Label>Imagens do Produto</Label>
+              <Label>Upload de Imagens</Label>
               <p className="text-sm text-muted-foreground">
-                Funcionalidade de upload de imagens será implementada em breve.
+                Você pode fazer upload de imagens manualmente ou usar a geração
+                por IA acima.
               </p>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
                 <p className="text-muted-foreground">
