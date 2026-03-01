@@ -7,53 +7,45 @@ import {
   CardHeader,
   CardTitle,
 } from "@gaqno-development/frontcore/components/ui";
-import { useERPKPIs } from "@gaqno-development/frontcore";
+import { useDashboardStats } from "../hooks/useDashboardStats";
 import { ShoppingCart, Package, Warehouse, TrendingUp } from "lucide-react";
 import { QuickLinksCard } from "../components/QuickLinksCard";
 import { StatCard } from "../components/shared";
 
 export default function DashboardPage() {
-  const { stats, isLoading } = useERPKPIs();
+  const { statCards, isLoading } = useDashboardStats();
+
+  const getIcon = (title: string) => {
+    switch (title) {
+      case "Total de Produtos":
+        return Package;
+      case "Estoque Baixo":
+        return Warehouse;
+      case "Pedidos (Mês)":
+        return ShoppingCart;
+      case "Faturamento (Mês)":
+        return TrendingUp;
+      default:
+        return undefined;
+    }
+  };
 
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">Painel ERP</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total de Produtos"
-          value={isLoading ? "…" : stats.totalProducts}
-          icon={Package}
-          isLoading={isLoading}
-        />
-        <StatCard
-          title="Estoque Baixo"
-          value={isLoading ? "…" : stats.lowStockCount}
-          icon={Warehouse}
-          isLoading={isLoading}
-          description={
-            !isLoading && stats.lowStockCount > 0
-              ? "Ação recomendada: Reposição"
-              : undefined
-          }
-          trend={
-            !isLoading && stats.lowStockCount > 0
-              ? { value: "Atenção", isPositive: false }
-              : undefined
-          }
-        />
-        <StatCard
-          title="Pedidos (Mês)"
-          value="0"
-          icon={ShoppingCart}
-          description="Aguardando integração"
-        />
-        <StatCard
-          title="Faturamento (Mês)"
-          value="R$ 0,00"
-          icon={TrendingUp}
-          description="Aguardando integração"
-        />
+        {statCards.map((card, index) => (
+          <StatCard
+            key={index}
+            title={card.title}
+            value={card.value}
+            icon={getIcon(card.title)}
+            isLoading={isLoading}
+            description={card.description}
+            trend={card.trend}
+          />
+        ))}
       </div>
 
       <QuickLinksCard />
