@@ -21,7 +21,7 @@ import { Link, useLocation } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import CatalogPage from "./pages/CatalogPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
-import ProductFormPage from "./pages/ProductFormPage";
+import ProductWizardPage from "./pages/ProductWizardPage";
 import AIContentPage from "./pages/AIContentPage";
 import OrdersListPage from "./pages/OrdersListPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
@@ -124,7 +124,7 @@ export default function App() {
               path="/erp/catalog/new"
               element={
                 <ERPLayout>
-                  <ProductFormPage />
+                  <ProductWizardPage />
                 </ERPLayout>
               }
             />
@@ -132,7 +132,7 @@ export default function App() {
               path="/erp/catalog/:id/edit"
               element={
                 <ERPLayout>
-                  <ProductFormPage />
+                  <ProductWizardPage />
                 </ERPLayout>
               }
             />
@@ -168,7 +168,10 @@ export default function App() {
                 </ERPLayout>
               }
             />
-            <Route path="*" element={<Navigate to="/erp/dashboard" replace />} />
+            <Route
+              path="*"
+              element={<Navigate to="/erp/dashboard" replace />}
+            />
           </Routes>
         </TenantProvider>
       </AuthProvider>
