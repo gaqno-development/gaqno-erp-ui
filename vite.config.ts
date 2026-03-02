@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import path from "path";
 import react from "@vitejs/plugin-react";
 import federation from "@originjs/vite-plugin-federation";
+import { FEDERATION_SHARED } from "@gaqno-development/frontcore/config/federation-shared";
 
 export default defineConfig(async () => {
   const tailwindcss = (await import("@tailwindcss/vite")).default;
@@ -38,42 +39,7 @@ export default defineConfig(async () => {
           "./OrderDetailPage": "./src/pages/OrderDetailPage.tsx",
           "./AIContentPage": "./src/pages/AIContentPage.tsx",
         },
-        shared: {
-          react: {
-            singleton: true,
-            requiredVersion: "^18.0.0",
-            eager: true,
-          },
-          "react-dom": {
-            singleton: true,
-            requiredVersion: "^18.0.0",
-            eager: true,
-          },
-          "react-router-dom": {
-            singleton: true,
-            requiredVersion: "^6.0.0",
-          },
-          "@tanstack/react-query": {
-            singleton: true,
-            requiredVersion: "^5.0.0",
-          },
-          zustand: {
-            singleton: true,
-            requiredVersion: "^4.0.0",
-          },
-          "use-sync-external-store": {
-            singleton: true,
-            requiredVersion: "*",
-          },
-          i18next: {
-            singleton: true,
-            requiredVersion: "^24.0.0",
-          },
-          "react-i18next": {
-            singleton: true,
-            requiredVersion: "^15.0.0",
-          },
-        } as any,
+        shared: FEDERATION_SHARED as any,
       }),
     ],
     build: {
