@@ -28,10 +28,14 @@ export default defineConfig(async () => {
         filename: "remoteEntry.js",
         exposes: {
           "./App": "./src/App.tsx",
+          "./ERPLayout": "./src/ERPLayout.tsx",
           "./DashboardPage": "./src/pages/DashboardPage.tsx",
           "./CatalogPage": "./src/pages/CatalogPage.tsx",
+          "./ProductDetailPage": "./src/pages/ProductDetailPage.tsx",
+          "./ProductWizardPage": "./src/pages/ProductWizardPage.tsx",
           "./InventoryPage": "./src/pages/InventoryPage.tsx",
           "./OrdersListPage": "./src/pages/OrdersListPage.tsx",
+          "./OrderDetailPage": "./src/pages/OrderDetailPage.tsx",
           "./AIContentPage": "./src/pages/AIContentPage.tsx",
         },
         shared: {
