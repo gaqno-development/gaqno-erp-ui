@@ -42,8 +42,8 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("Algo deu errado")).toBeInTheDocument();
-    expect(screen.getByText(/Ocorreu um erro inesperado/)).toBeInTheDocument();
+    expect(screen.getByTestId("error-boundary")).toBeInTheDocument();
+    expect(screen.getByTestId("error-boundary-retry")).toBeInTheDocument();
   });
 
   it("should render custom fallback when provided", () => {
@@ -56,7 +56,7 @@ describe("ErrorBoundary", () => {
     );
 
     expect(screen.getByText("Custom error message")).toBeInTheDocument();
-    expect(screen.queryByText("Algo deu errado")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("error-boundary")).not.toBeInTheDocument();
   });
 
   it("should show retry button and reset error on retry", () => {
@@ -66,16 +66,12 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("Algo deu errado")).toBeInTheDocument();
+    expect(screen.getByTestId("error-boundary")).toBeInTheDocument();
 
-    const retryButton = screen.getByText("Tentar novamente");
+    const retryButton = screen.getByTestId("error-boundary-retry");
     expect(retryButton).toBeInTheDocument();
 
-    // Test that retry button is clickable
     fireEvent.click(retryButton);
-
-    // The retry functionality is tested - the button exists and can be clicked
-    // Full state reset testing is complex due to React's error boundary behavior
   });
 
   it("should show error details in development mode", () => {
@@ -87,7 +83,7 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("Detalhes do erro")).toBeInTheDocument();
+    expect(screen.getByTestId("error-boundary-details")).toBeInTheDocument();
   });
 
   it("should not show error details in production mode", () => {
@@ -99,6 +95,6 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.queryByText("Detalhes do erro")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("error-boundary-details")).not.toBeInTheDocument();
   });
 });
