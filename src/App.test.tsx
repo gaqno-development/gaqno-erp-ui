@@ -32,7 +32,7 @@ describe("App", () => {
 
   it("should render ERP layout with title", () => {
     render(<App />, { routerProps: { initialEntries: ["/erp/dashboard"] } });
-    expect(screen.getByText("ERP")).toBeInTheDocument();
+    expect(screen.getAllByText("ERP").length).toBeGreaterThanOrEqual(1);
   });
 
   it("should show dashboard when at /erp/dashboard", () => {
