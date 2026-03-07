@@ -8,6 +8,11 @@ vi.mock("@gaqno-development/frontcore", async () => {
   return { ...mock };
 });
 
+vi.mock("@gaqno-development/frontcore/hooks/erp", async () => {
+  const mock = await import("@/__mocks__/frontcore");
+  return { useErpOrders: mock.useErpOrders };
+});
+
 vi.mock("@gaqno-development/frontcore/components/ui", async () => {
   const mock = await import("@/__mocks__/frontcore");
   return mock.components.ui;

@@ -13,7 +13,7 @@ import {
   LoadingSkeleton,
   Badge,
 } from "@gaqno-development/frontcore/components/ui";
-import { useErpOrders } from "@gaqno-development/frontcore";
+import { useErpOrders } from "@gaqno-development/frontcore/hooks/erp";
 import { formatCurrency } from "@gaqno-development/frontcore/utils";
 import type { ErpOrder, ErpOrderStatus } from "@gaqno-development/types";
 import { ShoppingCart, Search } from "lucide-react";
