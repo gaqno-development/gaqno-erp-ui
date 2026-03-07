@@ -16,16 +16,16 @@ vi.mock("@gaqno-development/frontcore/components/ui", async () => {
 describe("OrdersListPage", () => {
   it("should show Pedidos heading", () => {
     render(<OrdersListPage />);
-    expect(screen.getByText("Pedidos")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Pedidos" })).toBeInTheDocument();
   });
 
-  it("should show Pedidos de venda card", () => {
+  it("should show search placeholder", () => {
     render(<OrdersListPage />);
-    expect(screen.getByText("Pedidos de venda")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Buscar por cliente/i)).toBeInTheDocument();
   });
 
-  it("should show empty state message", () => {
+  it("should show empty state when no orders", () => {
     render(<OrdersListPage />);
-    expect(screen.getByText(/Nenhum pedido para exibir ainda/i)).toBeInTheDocument();
+    expect(screen.getByText(/Nenhum pedido ainda/i)).toBeInTheDocument();
   });
 });

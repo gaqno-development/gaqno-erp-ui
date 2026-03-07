@@ -47,7 +47,7 @@ describe("App", () => {
 
   it("should show orders when at /erp/orders", () => {
     render(<App />, { routerProps: { initialEntries: ["/erp/orders"] } });
-    expect(screen.getByText("Pedidos de venda")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Pedidos" })).toBeInTheDocument();
   });
 
   it("should show inventory when at /erp/inventory", () => {

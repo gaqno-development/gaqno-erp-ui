@@ -3,6 +3,7 @@ import { initI18n, I18nProvider } from "@gaqno-development/frontcore/i18n";
 import { ERPLayout } from "./ERPLayout";
 import DashboardPage from "./pages/DashboardPage";
 import CatalogPage from "./pages/CatalogPage";
+import ProductFormPage from "./pages/ProductFormPage";
 import OrdersListPage from "./pages/OrdersListPage";
 import InventoryPage from "./pages/InventoryPage";
 import AIContentPage from "./pages/AIContentPage";
@@ -27,6 +28,22 @@ export default function App() {
           element={
             <ERPLayout>
               <CatalogPage />
+            </ERPLayout>
+          }
+        />
+        <Route
+          path="/erp/catalog/new"
+          element={
+            <ERPLayout>
+              <ProductFormPage />
+            </ERPLayout>
+          }
+        />
+        <Route
+          path="/erp/catalog/:id/edit"
+          element={
+            <ERPLayout>
+              <ProductFormPage />
             </ERPLayout>
           }
         />

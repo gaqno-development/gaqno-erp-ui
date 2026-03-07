@@ -6,6 +6,21 @@ export const useERPKPIs = vi.fn(() => ({
   isLoading: false,
 }));
 export const useErpProducts = vi.fn(() => ({ data: [], isLoading: false }));
+export const useErpProduct = vi.fn((id: string | undefined) => ({
+  data: id ? { id, name: "Mock Product", price: 10, tenantId: "t1", status: "active" as const } : undefined,
+  isLoading: false,
+}));
+export const useCreateErpProduct = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "new-1", name: "New" }),
+  isPending: false,
+  error: null,
+}));
+export const useUpdateErpProduct = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "123", name: "Updated" }),
+  isPending: false,
+  error: null,
+}));
+export const useErpOrders = vi.fn(() => ({ data: [], isLoading: false }));
 export const useERPInventory = vi.fn(() => ({
   inventory: { withStock: [], lowStock: [] },
   isLoading: false,
@@ -41,6 +56,9 @@ export const SelectItem = ({ children, value, ...p }: { children?: React.ReactNo
 );
 export const SelectTrigger = Div;
 export const SelectValue = ({ placeholder }: { placeholder?: string }) => <span>{placeholder}</span>;
+export const Label = ({ children, htmlFor, ...p }: { children?: React.ReactNode; htmlFor?: string; [k: string]: unknown }) => (
+  <label htmlFor={htmlFor} {...p}>{children}</label>
+);
 
 export const Checkbox = ({ checked, onCheckedChange, ...p }: { checked?: boolean; onCheckedChange?: (v: boolean) => void }) => (
   <input type="checkbox" checked={checked} onChange={(e) => onCheckedChange?.(e.target.checked)} {...p} />
@@ -119,6 +137,7 @@ export const components = {
     SelectItem,
     SelectTrigger,
     SelectValue,
+    Label,
     Checkbox,
     Tabs,
     TabsList,

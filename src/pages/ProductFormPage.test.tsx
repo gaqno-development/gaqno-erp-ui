@@ -29,7 +29,6 @@ describe("ProductFormPage", () => {
       routePath: "/erp/catalog/:id/edit",
     });
     expect(screen.getByText("Editar produto")).toBeInTheDocument();
-    expect(screen.getByText(/Editando produto id: 123/i)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Voltar para o produto/i })).toBeInTheDocument();
   });
 });
