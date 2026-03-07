@@ -132,9 +132,9 @@ export const components = {
   ui: {
     Card: Div,
     CardContent: Div,
-    CardDescription: ({ children }: { children?: React.ReactNode }) => <p>{children}</p>,
+    CardDescription: ({ children, ...p }: { children?: React.ReactNode }) => <p {...p}>{children}</p>,
     CardHeader: Div,
-    CardTitle: ({ children }: { children?: React.ReactNode }) => <h3>{children}</h3>,
+    CardTitle: ({ children, ...p }: { children?: React.ReactNode }) => <h3 {...p}>{children}</h3>,
     Button,
     Input,
     Select,
@@ -167,3 +167,10 @@ export const AIContentGenerator = () => <div data-testid="ai-content-generator" 
 export const AIVideoGenerator = () => <div data-testid="ai-video-generator" />;
 export const AIBillingSummary = ({ title }: { title?: string }) => <div data-testid="ai-billing-summary">{title}</div>;
 export const AIAttributionDashboard = ({ title }: { title?: string }) => <div data-testid="ai-attribution-dashboard">{title}</div>;
+
+export const PageLayout = ({ children, title }: { children?: React.ReactNode; title?: string }) => (
+  <div data-testid="page-layout">
+    {title && <h1 data-testid="page-layout-title">{title}</h1>}
+    {children}
+  </div>
+);

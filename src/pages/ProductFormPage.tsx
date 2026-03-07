@@ -139,7 +139,7 @@ export default function ProductFormPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="product-form-page">
       <Button variant="ghost" size="sm" asChild>
         <Link to={isEdit && id ? `/erp/catalog/${id}` : "/erp/catalog"}>
           <ChevronLeft className="h-4 w-4 mr-1" />
@@ -148,7 +148,7 @@ export default function ProductFormPage() {
       </Button>
       <Card>
         <CardHeader>
-          <CardTitle>{isEdit ? "Editar produto" : "Novo produto"}</CardTitle>
+          <CardTitle data-testid="product-form-title">{isEdit ? "Editar produto" : "Novo produto"}</CardTitle>
           <CardDescription>
             {isEdit
               ? "Altere os dados do produto e salve."

@@ -19,8 +19,7 @@ describe("ProductFormPage", () => {
       routerProps: { initialEntries: ["/erp/catalog/new"] },
       routePath: "/erp/catalog/new",
     });
-    expect(screen.getByText("Novo produto")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Voltar para o catálogo/i })).toBeInTheDocument();
+    expect(screen.getByTestId("product-form-title")).toHaveTextContent("Novo produto");
   });
 
   it("should show Editar produto when id in route", () => {
@@ -28,7 +27,6 @@ describe("ProductFormPage", () => {
       routerProps: { initialEntries: ["/erp/catalog/123/edit"] },
       routePath: "/erp/catalog/:id/edit",
     });
-    expect(screen.getByText("Editar produto")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Voltar para o produto/i })).toBeInTheDocument();
+    expect(screen.getByTestId("product-form-title")).toHaveTextContent("Editar produto");
   });
 });

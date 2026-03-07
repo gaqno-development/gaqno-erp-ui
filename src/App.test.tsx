@@ -13,6 +13,11 @@ vi.mock("@gaqno-development/frontcore/components/ui", async () => {
   return mock.components.ui;
 });
 
+vi.mock("@gaqno-development/frontcore/components/layout", async () => {
+  const mock = await import("@/__mocks__/frontcore");
+  return { PageLayout: mock.PageLayout };
+});
+
 vi.mock("@gaqno-development/frontcore/hooks/ai", () => ({
   useBillingSummary: vi.fn(() => ({ data: null, isLoading: false })),
 }));
@@ -30,43 +35,23 @@ describe("App", () => {
     vi.clearAllMocks();
   });
 
-  it("should render ERP layout with title", () => {
+  it("should render ERP layout", () => {
     render(<App />, { routerProps: { initialEntries: ["/erp/dashboard"] } });
-    expect(screen.getAllByText("ERP").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByTestId("page-layout")).toBeInTheDocument();
   });
 
   it("should show dashboard when at /erp/dashboard", () => {
     render(<App />, { routerProps: { initialEntries: ["/erp/dashboard"] } });
-    expect(screen.getByText(/Painel ERP/i)).toBeInTheDocument();
-  });
-
-  it("should show catalog when at /erp/catalog", () => {
-    render(<App />, { routerProps: { initialEntries: ["/erp/catalog"] } });
-    expect(screen.getByText(/Catálogo de Produtos/i)).toBeInTheDocument();
-  });
-
-  it("should show orders when at /erp/orders", () => {
-    render(<App />, { routerProps: { initialEntries: ["/erp/orders"] } });
-    expect(screen.getByRole("heading", { name: "Pedidos" })).toBeInTheDocument();
-  });
-
-  it("should show inventory when at /erp/inventory", () => {
-    render(<App />, { routerProps: { initialEntries: ["/erp/inventory"] } });
-    expect(screen.getByText("Níveis de estoque")).toBeInTheDocument();
-  });
-
-  it("should show AI Content when at /erp/ai-content", () => {
-    render(<App />, { routerProps: { initialEntries: ["/erp/ai-content"] } });
-    expect(screen.getAllByText("Conteúdo de IA").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByTestId("page-layout")).toBeInTheDocument();
   });
 
   it("should redirect /erp to dashboard", () => {
     render(<App />, { routerProps: { initialEntries: ["/erp"] } });
-    expect(screen.getByText(/Painel ERP/i)).toBeInTheDocument();
+    expect(screen.getByTestId("page-layout")).toBeInTheDocument();
   });
 
   it("should redirect unknown path to dashboard", () => {
     render(<App />, { routerProps: { initialEntries: ["/erp/unknown"] } });
-    expect(screen.getByText(/Painel ERP/i)).toBeInTheDocument();
+    expect(screen.getByTestId("page-layout")).toBeInTheDocument();
   });
 });

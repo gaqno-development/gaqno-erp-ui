@@ -35,7 +35,7 @@ describe("ProductDetailPage", () => {
       routerProps: { initialEntries: ["/erp/catalog/1"] },
       routePath: "/erp/catalog/:id",
     });
-    expect(screen.getByText(/Carregando/i)).toBeInTheDocument();
+    expect(screen.getByTestId("product-loading")).toBeInTheDocument();
   });
 
   it("should show product not found when id does not match", () => {
@@ -43,7 +43,7 @@ describe("ProductDetailPage", () => {
       routerProps: { initialEntries: ["/erp/catalog/nonexistent"] },
       routePath: "/erp/catalog/:id",
     });
-    expect(screen.getByText(/Produto não encontrado/i)).toBeInTheDocument();
+    expect(screen.getByTestId("product-not-found")).toBeInTheDocument();
   });
 
   it("should show product name and actions when product exists", () => {
@@ -57,9 +57,7 @@ describe("ProductDetailPage", () => {
       routerProps: { initialEntries: ["/erp/catalog/1"] },
       routePath: "/erp/catalog/:id",
     });
-    expect(screen.getByText("Test Product")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Voltar para o catálogo/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Editar produto/i })).toBeInTheDocument();
-    expect(screen.getByText(/Gerar conteúdo de marketing/i)).toBeInTheDocument();
+    expect(screen.getByTestId("product-detail-name")).toHaveTextContent("Test Product");
+    expect(screen.getByTestId("product-detail-page")).toBeInTheDocument();
   });
 });

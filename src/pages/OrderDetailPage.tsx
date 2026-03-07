@@ -23,7 +23,7 @@ export default function OrderDetailPage() {
       </Button>
       <Card>
         <CardHeader>
-          <CardTitle>Pedido {id ?? "—"}</CardTitle>
+          <CardTitle data-testid="order-detail-title">Pedido {id ?? "—"}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">

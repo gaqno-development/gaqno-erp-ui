@@ -50,14 +50,14 @@ export default function ProductDetailPage() {
 
   if (productsQuery.isLoading || !product) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="product-detail-fallback">
         <Button variant="ghost" size="sm" asChild>
           <Link to="/erp/catalog">
             <ChevronLeft className="h-4 w-4 mr-1" />
             Voltar para o catálogo
           </Link>
         </Button>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground" data-testid={productsQuery.isLoading ? "product-loading" : "product-not-found"}>
           {productsQuery.isLoading ? "Carregando…" : "Produto não encontrado."}
         </p>
       </div>
@@ -65,7 +65,7 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="product-detail-page">
       <Button variant="ghost" size="sm" asChild>
         <Link to="/erp/catalog">
           <ChevronLeft className="h-4 w-4 mr-1" />
@@ -75,7 +75,7 @@ export default function ProductDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{product.name}</CardTitle>
+          <CardTitle data-testid="product-detail-name">{product.name}</CardTitle>
           <p className="text-sm text-muted-foreground">
             Preço: {product.price} · Categoria: {product.category ?? "—"}
           </p>
