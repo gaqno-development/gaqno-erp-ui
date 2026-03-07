@@ -32,7 +32,15 @@ function AllTheProviders({
   );
   return (
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter {...routerProps}>{content}</MemoryRouter>
+      <MemoryRouter
+        {...routerProps}
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        {content}
+      </MemoryRouter>
     </QueryClientProvider>
   );
 }

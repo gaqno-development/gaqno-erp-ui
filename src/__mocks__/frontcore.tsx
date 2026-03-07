@@ -26,7 +26,7 @@ export const useERPInventory = vi.fn(() => ({
   isLoading: false,
 }));
 
-const Div = ({ children, ...props }: { children?: React.ReactNode; [k: string]: unknown }) => (
+const Div = ({ children, onValueChange: _ov, ...props }: { children?: React.ReactNode; onValueChange?: (v: string) => void; [k: string]: unknown }) => (
   <div {...props}>{children}</div>
 );
 
@@ -49,7 +49,12 @@ export const Input = React.forwardRef((props: Record<string, unknown>, ref: Reac
   <input ref={ref} {...props} />
 ));
 
-export const Select = Div;
+export const Select = ({
+  onValueChange: _onValueChange,
+  ...props
+}: { onValueChange?: (v: string) => void; children?: React.ReactNode; [k: string]: unknown }) => (
+  <div {...props} />
+);
 export const SelectContent = Div;
 export const SelectItem = ({ children, value, ...p }: { children?: React.ReactNode; value?: string }) => (
   <option value={value} {...p}>{children}</option>
