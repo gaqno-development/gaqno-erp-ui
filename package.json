@@ -15,7 +15,7 @@
     "test:coverage": "vitest --run --coverage"
   },
   "dependencies": {
-    "@gaqno-development/frontcore": "^1.5.0",
+    "@gaqno-development/frontcore": "^1.6.9",
     "@gaqno-development/types": "^1.0.0",
     "@hookform/resolvers": "^3.10.0",
     "@tanstack/react-query": "^5.90.12",
