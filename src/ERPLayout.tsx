@@ -8,6 +8,9 @@ import {
   ShoppingCart,
   Warehouse,
   Sparkles,
+  Building2,
+  ClipboardList,
+  Truck,
 } from "lucide-react";
 
 const TAB_KEYS = [
@@ -15,6 +18,9 @@ const TAB_KEYS = [
   { id: "catalog", href: "/erp/catalog", icon: <Package className="h-4 w-4" />, tKey: "erp.catalog" },
   { id: "orders", href: "/erp/orders", icon: <ShoppingCart className="h-4 w-4" />, tKey: "erp.orders" },
   { id: "inventory", href: "/erp/inventory", icon: <Warehouse className="h-4 w-4" />, tKey: "erp.inventory" },
+  { id: "suppliers", href: "/erp/suppliers", icon: <Building2 className="h-4 w-4" />, tKey: "erp.suppliers" },
+  { id: "purchasing", href: "/erp/purchasing", icon: <ClipboardList className="h-4 w-4" />, tKey: "erp.purchasing" },
+  { id: "logistics", href: "/erp/logistics", icon: <Truck className="h-4 w-4" />, tKey: "erp.logistics" },
   { id: "ai-content", href: "/erp/ai-content", icon: <Sparkles className="h-4 w-4" />, tKey: "erp.aiContent" },
 ] as const;
 

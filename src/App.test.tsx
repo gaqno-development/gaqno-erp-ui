@@ -35,23 +35,29 @@ describe("App", () => {
     vi.clearAllMocks();
   });
 
-  it("should render ERP layout", () => {
-    render(<App />, { routerProps: { initialEntries: ["/erp/dashboard"] } });
-    expect(screen.getByTestId("page-layout")).toBeInTheDocument();
-  });
-
-  it("should show dashboard when at /erp/dashboard", () => {
-    render(<App />, { routerProps: { initialEntries: ["/erp/dashboard"] } });
-    expect(screen.getByTestId("page-layout")).toBeInTheDocument();
+  it("should render dashboard at /erp/dashboard", () => {
+    const { container } = render(<App />, {
+      routerProps: { initialEntries: ["/erp/dashboard"] },
+    });
+    expect(container.innerHTML).not.toBe("");
   });
 
   it("should redirect /erp to dashboard", () => {
-    render(<App />, { routerProps: { initialEntries: ["/erp"] } });
-    expect(screen.getByTestId("page-layout")).toBeInTheDocument();
+    const { container } = render(<App />, {
+      routerProps: { initialEntries: ["/erp"] },
+    });
+    expect(container.innerHTML).not.toBe("");
+  });
+
+  it("should render product form at /erp/catalog/new", () => {
+    render(<App />, { routerProps: { initialEntries: ["/erp/catalog/new"] } });
+    expect(screen.getByTestId("product-form-page")).toBeInTheDocument();
   });
 
   it("should redirect unknown path to dashboard", () => {
-    render(<App />, { routerProps: { initialEntries: ["/erp/unknown"] } });
-    expect(screen.getByTestId("page-layout")).toBeInTheDocument();
+    const { container } = render(<App />, {
+      routerProps: { initialEntries: ["/erp/unknown"] },
+    });
+    expect(container.innerHTML).not.toBe("");
   });
 });

@@ -25,6 +25,49 @@ export const useERPInventory = vi.fn(() => ({
   inventory: { withStock: [], lowStock: [] },
   isLoading: false,
 }));
+export const useStockMovements = vi.fn(() => ({ data: [], isLoading: false }));
+export const useWarehouses = vi.fn(() => ({ data: [], isLoading: false }));
+export const useCreateStockMovement = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "m1" }),
+  isPending: false,
+}));
+export const useCreateWarehouse = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "w1" }),
+  isPending: false,
+}));
+export const useProductStock = vi.fn(() => ({ data: null, isLoading: false }));
+export const useErpSuppliers = vi.fn(() => ({ data: [], isLoading: false }));
+export const useCreateErpSupplier = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "s1" }),
+  isPending: false,
+}));
+export const useUpdateErpSupplier = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "s1" }),
+  isPending: false,
+}));
+export const useErpPurchaseOrders = vi.fn(() => ({ data: [], isLoading: false }));
+export const useCreateErpPurchaseOrder = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "po1" }),
+  isPending: false,
+}));
+export const useUpdateErpPurchaseOrder = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "po1" }),
+  isPending: false,
+}));
+export const useErpCarriers = vi.fn(() => ({ data: [], isLoading: false }));
+export const useCreateErpCarrier = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "c1" }),
+  isPending: false,
+}));
+export const useErpShipments = vi.fn(() => ({ data: [], isLoading: false }));
+export const useCreateErpShipment = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "sh1" }),
+  isPending: false,
+}));
+export const useUpdateErpShipment = vi.fn(() => ({
+  mutateAsync: vi.fn().mockResolvedValue({ id: "sh1" }),
+  isPending: false,
+}));
 
 const Div = ({ children, onValueChange: _ov, ...props }: { children?: React.ReactNode; onValueChange?: (v: string) => void; [k: string]: unknown }) => (
   <div {...props}>{children}</div>
@@ -82,6 +125,14 @@ export const Sheet = ({ children, open }: { children?: React.ReactNode; open?: b
 export const SheetContent = Div;
 export const SheetHeader = Div;
 export const SheetTitle = ({ children }: { children?: React.ReactNode }) => <h2>{children}</h2>;
+
+export const Dialog = ({ children, open }: { children?: React.ReactNode; open?: boolean }) => (open ? <div data-testid="dialog">{children}</div> : null);
+export const DialogContent = Div;
+export const DialogHeader = Div;
+export const DialogTitle = ({ children }: { children?: React.ReactNode }) => <h2>{children}</h2>;
+export const DialogTrigger = ({ children }: { children?: React.ReactNode }) => <>{children}</>;
+
+export const Badge = ({ children, variant: _v }: { children?: React.ReactNode; variant?: string }) => <span data-testid="badge">{children}</span>;
 
 export const DataTable = ({ data, columns }: { data?: { data?: unknown[] }; columns?: unknown[] }) => {
   const rows = data?.data ?? [];
@@ -159,6 +210,13 @@ export const components = {
     EmptyState,
     LoadingSkeleton,
     ErrorBoundary,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    Badge,
+    ColumnDef: {} as any,
   },
 };
 
