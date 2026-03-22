@@ -75,8 +75,8 @@ export default function CatalogPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <LoadingSkeleton count={6} variant="card" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <LoadingSkeleton count={10} variant="card" />
         </div>
       ) : filteredProducts.length === 0 ? (
         <EmptyState
@@ -97,7 +97,7 @@ export default function CatalogPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredProducts.map((p) => (
             <ProductCard key={p.id} product={p} to={`/erp/catalog/${p.id}`} />
           ))}
