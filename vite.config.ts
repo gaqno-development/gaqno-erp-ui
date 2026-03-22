@@ -33,6 +33,7 @@ export default defineConfig(async () => {
           "./DashboardPage": "./src/pages/DashboardPage.tsx",
           "./CatalogPage": "./src/pages/CatalogPage.tsx",
           "./ProductDetailPage": "./src/pages/ProductDetailPage.tsx",
+          "./ProductFormPage": "./src/pages/ProductFormPage.tsx",
           "./ProductWizardPage": "./src/pages/ProductWizardPage.tsx",
           "./InventoryPage": "./src/pages/InventoryPage.tsx",
           "./OrdersListPage": "./src/pages/OrdersListPage.tsx",
