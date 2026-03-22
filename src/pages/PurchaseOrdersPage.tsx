@@ -10,28 +10,13 @@ import {
   EmptyState,
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpPurchaseOrders } from "@gaqno-development/frontcore";
+import { formatCurrency, formatDate } from "@gaqno-development/frontcore/utils";
+import {
+  ERP_PURCHASE_ORDER_STATUS_LABEL,
+  ERP_PURCHASE_ORDER_STATUS_VARIANT,
+} from "@gaqno-development/frontcore/config/erp-status";
 import type { ErpPurchaseOrder, ErpPurchaseOrderStatus } from "@gaqno-development/types";
 import { ClipboardList } from "lucide-react";
-
-const STATUS_VARIANT: Record<ErpPurchaseOrderStatus, "secondary" | "default" | "destructive" | "outline"> = {
-  draft: "secondary",
-  pending: "outline",
-  approved: "default",
-  received: "default",
-  cancelled: "destructive",
-};
-
-const STATUS_LABEL: Record<ErpPurchaseOrderStatus, string> = {
-  draft: "Rascunho",
-  pending: "Pendente",
-  approved: "Aprovado",
-  received: "Recebido",
-  cancelled: "Cancelado",
-};
-
-function formatBRL(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }).replace(/\u00a0/g, " ");
-}
 
 export default function PurchaseOrdersPage() {
   const query = useErpPurchaseOrders({ limit: 100 });
@@ -51,14 +36,14 @@ export default function PurchaseOrdersPage() {
       header: "Status",
       cell: ({ row }) => {
         const s = row.getValue("status") as ErpPurchaseOrderStatus;
-        return <Badge variant={STATUS_VARIANT[s]}>{STATUS_LABEL[s] ?? s}</Badge>;
+        return <Badge variant={ERP_PURCHASE_ORDER_STATUS_VARIANT[s]}>{ERP_PURCHASE_ORDER_STATUS_LABEL[s] ?? s}</Badge>;
       },
     },
     {
       accessorKey: "total",
       header: "Total",
       cell: ({ row }) => (
-        <span className="tabular-nums font-medium">{formatBRL(Number(row.getValue("total")))}</span>
+        <span className="tabular-nums font-medium">{formatCurrency(Number(row.getValue("total")))}</span>
       ),
     },
     {
@@ -67,7 +52,7 @@ export default function PurchaseOrdersPage() {
       cell: ({ row }) => {
         const d = row.getValue("expectedDeliveryDate") as string | null;
         return d ? (
-          <span className="text-sm tabular-nums">{new Date(d).toLocaleDateString("pt-BR")}</span>
+          <span className="text-sm tabular-nums">{formatDate(d)}</span>
         ) : <span className="text-muted-foreground">—</span>;
       },
     },
@@ -77,7 +62,7 @@ export default function PurchaseOrdersPage() {
       cell: ({ row }) => {
         const d = row.getValue("createdAt") as string;
         return d ? (
-          <span className="text-sm text-muted-foreground tabular-nums">{new Date(d).toLocaleDateString("pt-BR")}</span>
+          <span className="text-sm text-muted-foreground tabular-nums">{formatDate(d)}</span>
         ) : "—";
       },
     },

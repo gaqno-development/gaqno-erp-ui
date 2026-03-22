@@ -11,6 +11,7 @@ import {
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpShipments } from "@gaqno-development/frontcore";
 import type { ErpShipment, ErpShipmentStatus } from "@gaqno-development/types";
+import { formatDate } from "@gaqno-development/frontcore/utils";
 import { Truck, MapPin } from "lucide-react";
 
 const STATUS_VARIANT: Record<ErpShipmentStatus, "secondary" | "default" | "destructive" | "outline"> = {
@@ -78,7 +79,7 @@ export default function ShipmentsPage() {
       cell: ({ row }) => {
         const d = row.getValue("shippedAt") as string | null;
         return d ? (
-          <span className="text-sm tabular-nums">{new Date(d).toLocaleDateString("pt-BR")}</span>
+          <span className="text-sm tabular-nums">{formatDate(d)}</span>
         ) : <span className="text-muted-foreground">—</span>;
       },
     },
@@ -88,7 +89,7 @@ export default function ShipmentsPage() {
       cell: ({ row }) => {
         const d = row.getValue("deliveredAt") as string | null;
         return d ? (
-          <span className="text-sm tabular-nums text-emerald-600 dark:text-emerald-400">{new Date(d).toLocaleDateString("pt-BR")}</span>
+          <span className="text-sm tabular-nums text-emerald-600 dark:text-emerald-400">{formatDate(d)}</span>
         ) : <span className="text-muted-foreground">—</span>;
       },
     },

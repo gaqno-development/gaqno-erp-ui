@@ -15,9 +15,13 @@ import {
   SheetTitle,
   AnimatedEntry,
   Skeleton,
-  Separator,
+  CopyableId,
+  DetailRow,
+  StockIndicator,
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpProducts } from "@gaqno-development/frontcore";
+import { formatCurrency } from "@gaqno-development/frontcore/utils";
+import { ERP_PRODUCT_STATUS_THEME } from "@gaqno-development/frontcore/config/erp-status";
 import {
   ChevronLeft,
   FileText,
@@ -28,11 +32,6 @@ import {
   Tag,
   BarChart3,
   Sparkles,
-  TrendingDown,
-  AlertTriangle,
-  TrendingUp,
-  Copy,
-  Check,
 } from "lucide-react";
 
 const AIProductProfileBuilder = lazy(() =>
@@ -50,68 +49,6 @@ const AIVideoGenerator = lazy(() =>
     default: m.AIVideoGenerator,
   }))
 );
-
-const STATUS_THEME: Record<string, { label: string; class: string }> = {
-  active: { label: "Ativo", class: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
-  draft: { label: "Rascunho", class: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" },
-  inactive: { label: "Inativo", class: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20" },
-};
-
-function StockLevel({ stock }: { stock: number | undefined }) {
-  if (stock == null) return <span className="text-muted-foreground text-sm">N/A</span>;
-  if (stock === 0) {
-    return (
-      <span className="flex items-center gap-1.5 text-destructive font-medium">
-        <AlertTriangle className="h-4 w-4" />
-        Sem estoque
-      </span>
-    );
-  }
-  if (stock <= 10) {
-    return (
-      <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
-        <TrendingDown className="h-4 w-4" />
-        {stock} unidades
-      </span>
-    );
-  }
-  return (
-    <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-      <TrendingUp className="h-4 w-4" />
-      {stock} unidades
-    </span>
-  );
-}
-
-function DetailRow({ label, value, icon: Icon }: { label: string; value: React.ReactNode; icon?: React.ComponentType<{ className?: string }> }) {
-  return (
-    <div className="flex items-start gap-3 py-3">
-      {Icon && <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
-        <div className="mt-0.5 text-sm font-medium">{value}</div>
-      </div>
-    </div>
-  );
-}
-
-function CopyableId({ id }: { id: string }) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-  return (
-    <button
-      onClick={handleCopy}
-      className="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-    >
-      {id.slice(0, 8)}…
-      {copied ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
-    </button>
-  );
-}
 
 function AIFallback() {
   return (
@@ -188,10 +125,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  const status = STATUS_THEME[product.status ?? "active"] ?? STATUS_THEME.active;
-  const price = typeof product.price === "number"
-    ? product.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-    : "—";
+  const status = ERP_PRODUCT_STATUS_THEME[product.status ?? "active"] ?? ERP_PRODUCT_STATUS_THEME.active;
+  const price = typeof product.price === "number" ? formatCurrency(product.price) : "—";
 
   const productForProfile = {
     id: product.id,
@@ -308,7 +243,7 @@ export default function ProductDetailPage() {
                 {product.category && <DetailRow label="Categoria" value={product.category} icon={Layers} />}
                 <DetailRow
                   label="Estoque"
-                  value={<StockLevel stock={product.stock} />}
+                  value={<StockIndicator stock={product.stock} />}
                   icon={BarChart3}
                 />
               </div>

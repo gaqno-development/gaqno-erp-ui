@@ -24,6 +24,7 @@ import {
   DialogTrigger,
   AnimatedEntry,
   Badge,
+  StockIndicator,
 } from "@gaqno-development/frontcore/components/ui";
 import {
   useERPInventory,
@@ -32,6 +33,7 @@ import {
   useCreateStockMovement,
   useCreateWarehouse,
 } from "@gaqno-development/frontcore";
+import { formatDate } from "@gaqno-development/frontcore/utils";
 import type { ErpStockMovement, StockMovementType } from "@gaqno-development/types";
 import { LowStockAlert } from "../components/LowStockAlert";
 import {
@@ -42,9 +44,6 @@ import {
   ArrowLeftRight,
   Warehouse,
   BarChart3,
-  TrendingDown,
-  AlertTriangle,
-  TrendingUp,
   ExternalLink,
 } from "lucide-react";
 
@@ -69,30 +68,6 @@ const MOVEMENT_TYPE_COLORS: Record<StockMovementType, string> = {
   transfer: "text-violet-600 dark:text-violet-400",
 };
 
-function StockBadge({ stock, isLow }: { stock: number; isLow: boolean }) {
-  if (stock === 0) {
-    return (
-      <span className="flex items-center gap-1 text-xs font-medium text-destructive">
-        <AlertTriangle className="h-3 w-3" />
-        Sem estoque
-      </span>
-    );
-  }
-  if (isLow) {
-    return (
-      <span className="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-        <TrendingDown className="h-3 w-3" />
-        {stock} un.
-      </span>
-    );
-  }
-  return (
-    <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
-      <TrendingUp className="h-3 w-3" />
-      {stock} un.
-    </span>
-  );
-}
 
 export default function InventoryPage() {
   const { inventory, isLoading: isLoadingProducts } = useERPInventory({ limit: 200 });
@@ -149,8 +124,7 @@ export default function InventoryPage() {
       header: "Estoque",
       cell: ({ row }) => {
         const stock = row.getValue("stock") as number;
-        const isLow = lowStock.some((p: any) => p.id === row.original.id);
-        return <StockBadge stock={stock} isLow={isLow} />;
+        return <StockIndicator stock={stock} showUnit={false} />;
       },
     },
     {
@@ -212,7 +186,7 @@ export default function InventoryPage() {
         const d = row.getValue("createdAt") as string;
         return d ? (
           <span className="text-sm text-muted-foreground tabular-nums">
-            {new Date(d).toLocaleDateString("pt-BR")}
+            {formatDate(d)}
           </span>
         ) : "—";
       },

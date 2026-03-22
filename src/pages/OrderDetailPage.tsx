@@ -9,11 +9,17 @@ import {
   Button,
   Badge,
   AnimatedEntry,
-  Separator,
   Skeleton,
+  CopyableId,
+  DetailRow,
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpOrders } from "@gaqno-development/frontcore/hooks/erp";
-import { formatCurrency } from "@gaqno-development/frontcore/utils";
+import { formatCurrency, formatDateTime } from "@gaqno-development/frontcore/utils";
+import {
+  ERP_ORDER_STATUS_LABEL,
+  ERP_ORDER_STATUS_CLASS,
+  ERP_ORDER_STATUS_STEPS,
+} from "@gaqno-development/frontcore/config/erp-status";
 import type { ErpOrderStatus } from "@gaqno-development/types";
 import {
   ChevronLeft,
@@ -22,57 +28,22 @@ import {
   Mail,
   Calendar,
   Hash,
-  Copy,
-  Check,
   Clock,
   Package,
   CheckCircle2,
   Truck,
   XCircle,
-  AlertCircle,
   Settings,
 } from "lucide-react";
-import { useState } from "react";
 
-const STATUS_CONFIG: Record<ErpOrderStatus, { label: string; icon: typeof Clock; class: string }> = {
-  pending: { label: "Pendente", icon: Clock, class: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" },
-  confirmed: { label: "Confirmado", icon: CheckCircle2, class: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20" },
-  processing: { label: "Em processamento", icon: Settings, class: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20" },
-  shipped: { label: "Enviado", icon: Truck, class: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20" },
-  delivered: { label: "Entregue", icon: Package, class: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
-  cancelled: { label: "Cancelado", icon: XCircle, class: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20" },
+const STATUS_ICON: Record<ErpOrderStatus, typeof Clock> = {
+  pending: Clock,
+  confirmed: CheckCircle2,
+  processing: Settings,
+  shipped: Truck,
+  delivered: Package,
+  cancelled: XCircle,
 };
-
-const STATUS_STEPS: ErpOrderStatus[] = ["pending", "confirmed", "processing", "shipped", "delivered"];
-
-function formatDate(iso: string): string {
-  try {
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(iso));
-  } catch {
-    return iso;
-  }
-}
-
-function CopyableId({ id }: { id: string }) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-  return (
-    <button onClick={handleCopy} className="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors">
-      {id.slice(0, 12)}…
-      {copied ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
-    </button>
-  );
-}
 
 function StatusTimeline({ currentStatus }: { currentStatus: ErpOrderStatus }) {
   if (currentStatus === "cancelled") {
@@ -86,13 +57,13 @@ function StatusTimeline({ currentStatus }: { currentStatus: ErpOrderStatus }) {
     );
   }
 
-  const currentIndex = STATUS_STEPS.indexOf(currentStatus);
+  const currentIndex = ERP_ORDER_STATUS_STEPS.indexOf(currentStatus);
 
   return (
     <div className="flex items-center gap-1 py-4 overflow-x-auto">
-      {STATUS_STEPS.map((step, i) => {
-        const config = STATUS_CONFIG[step];
-        const Icon = config.icon;
+      {ERP_ORDER_STATUS_STEPS.map((step, i) => {
+        const Icon = STATUS_ICON[step];
+        const label = ERP_ORDER_STATUS_LABEL[step];
         const isCompleted = i <= currentIndex;
         const isCurrent = i === currentIndex;
         return (
@@ -111,24 +82,12 @@ function StatusTimeline({ currentStatus }: { currentStatus: ErpOrderStatus }) {
                 <Icon className="h-3.5 w-3.5" />
               </div>
               <span className={`text-[10px] font-medium whitespace-nowrap ${isCurrent ? "text-foreground" : "text-muted-foreground"}`}>
-                {config.label}
+                {label}
               </span>
             </div>
           </div>
         );
       })}
-    </div>
-  );
-}
-
-function DetailItem({ icon: Icon, label, value }: { icon: typeof User; label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-3 py-3">
-      <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
-        <div className="mt-0.5 text-sm font-medium">{value}</div>
-      </div>
     </div>
   );
 }
@@ -179,7 +138,8 @@ export default function OrderDetailPage() {
     );
   }
 
-  const statusConfig = STATUS_CONFIG[order.status as ErpOrderStatus] ?? STATUS_CONFIG.pending;
+  const statusLabel = ERP_ORDER_STATUS_LABEL[order.status as ErpOrderStatus] ?? ERP_ORDER_STATUS_LABEL.pending;
+  const statusClass = ERP_ORDER_STATUS_CLASS[order.status as ErpOrderStatus] ?? ERP_ORDER_STATUS_CLASS.pending;
   const total = typeof order.total === "string" ? parseFloat(order.total) : order.total;
 
   return (
@@ -203,10 +163,10 @@ export default function OrderDetailPage() {
                     Pedido #{order.id.slice(0, 8)}
                   </CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Criado em {formatDate(order.createdAt)}
+                    Criado em {formatDateTime(order.createdAt, { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>
-                <Badge className={`${statusConfig.class} border`}>{statusConfig.label}</Badge>
+                <Badge className={`${statusClass} border`}>{statusLabel}</Badge>
               </div>
             </CardHeader>
             <CardContent>
@@ -246,16 +206,16 @@ export default function OrderDetailPage() {
             </CardHeader>
             <CardContent className="pt-0">
               <div className="divide-y divide-border/50">
-                <DetailItem icon={Hash} label="ID" value={<CopyableId id={order.id} />} />
+                <DetailRow icon={Hash} label="ID" value={<CopyableId id={order.id} maxLength={12} />} />
                 {order.customerName && (
-                  <DetailItem icon={User} label="Cliente" value={order.customerName} />
+                  <DetailRow icon={User} label="Cliente" value={order.customerName} />
                 )}
                 {order.customerEmail && (
-                  <DetailItem icon={Mail} label="Email" value={order.customerEmail} />
+                  <DetailRow icon={Mail} label="Email" value={order.customerEmail} />
                 )}
-                <DetailItem icon={Calendar} label="Criado em" value={formatDate(order.createdAt)} />
+                <DetailRow icon={Calendar} label="Criado em" value={formatDateTime(order.createdAt, { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })} />
                 {order.updatedAt && (
-                  <DetailItem icon={Calendar} label="Atualizado em" value={formatDate(order.updatedAt)} />
+                  <DetailRow icon={Calendar} label="Atualizado em" value={formatDateTime(order.updatedAt, { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })} />
                 )}
               </div>
             </CardContent>

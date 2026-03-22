@@ -6,54 +6,26 @@ import {
   Card,
   CardContent,
   Button,
-  Input,
   DataTable,
   ColumnDef,
   EmptyState,
   LoadingSkeleton,
   Badge,
   AnimatedEntry,
+  SearchField,
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpOrders } from "@gaqno-development/frontcore/hooks/erp";
-import { formatCurrency } from "@gaqno-development/frontcore/utils";
+import { formatCurrency, formatDateTime } from "@gaqno-development/frontcore/utils";
+import {
+  ERP_ORDER_STATUS_LABEL,
+  ERP_ORDER_STATUS_VARIANT,
+} from "@gaqno-development/frontcore/config/erp-status";
 import type { ErpOrder, ErpOrderStatus } from "@gaqno-development/types";
-import { ShoppingCart, Search, ExternalLink } from "lucide-react";
-
-const STATUS_LABELS: Record<ErpOrderStatus, string> = {
-  pending: "Pendente",
-  confirmed: "Confirmado",
-  processing: "Em processamento",
-  shipped: "Enviado",
-  delivered: "Entregue",
-  cancelled: "Cancelado",
-};
-
-const STATUS_VARIANTS: Record<ErpOrderStatus, "secondary" | "default" | "destructive" | "outline"> = {
-  pending: "secondary",
-  confirmed: "outline",
-  processing: "default",
-  shipped: "default",
-  delivered: "default",
-  cancelled: "destructive",
-};
+import { ShoppingCart, ExternalLink } from "lucide-react";
 
 const ALL_STATUSES: readonly (ErpOrderStatus | "all")[] = [
   "all", "pending", "confirmed", "processing", "shipped", "delivered", "cancelled",
 ] as const;
-
-function formatOrderDate(iso: string): string {
-  try {
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(iso));
-  } catch {
-    return iso;
-  }
-}
 
 export default function OrdersListPage() {
   const [search, setSearch] = useState("");
@@ -124,8 +96,8 @@ export default function OrdersListPage() {
       cell: ({ row }) => {
         const s = row.original.status as ErpOrderStatus;
         return (
-          <Badge variant={STATUS_VARIANTS[s]} className="font-normal">
-            {STATUS_LABELS[s]}
+          <Badge variant={ERP_ORDER_STATUS_VARIANT[s]} className="font-normal">
+            {ERP_ORDER_STATUS_LABEL[s]}
           </Badge>
         );
       },
@@ -134,7 +106,7 @@ export default function OrdersListPage() {
       accessorKey: "createdAt",
       header: "Data",
       cell: ({ row }) => (
-        <span className="text-muted-foreground text-sm tabular-nums">{formatOrderDate(row.original.createdAt)}</span>
+        <span className="text-muted-foreground text-sm tabular-nums">{formatDateTime(row.original.createdAt, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
       ),
     },
     {
@@ -165,15 +137,11 @@ export default function OrdersListPage() {
 
       <AnimatedEntry direction="up" delay={0.05}>
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="Buscar por cliente, e-mail ou ID…"
-              className="pl-9 h-10 bg-background"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          <SearchField
+            value={search}
+            onChange={setSearch}
+            placeholder="Buscar por cliente, e-mail ou ID…"
+          />
           <div className="flex flex-wrap gap-1.5">
             {ALL_STATUSES.map((key) => {
               const isActive = statusFilter === key;
@@ -186,7 +154,7 @@ export default function OrdersListPage() {
                   onClick={() => setStatusFilter(key)}
                   className={`h-8 text-xs ${isActive ? "font-medium" : "text-muted-foreground"}`}
                 >
-                  {key === "all" ? "Todos" : STATUS_LABELS[key]}
+                  {key === "all" ? "Todos" : ERP_ORDER_STATUS_LABEL[key]}
                   {count > 0 && (
                     <span className={`ml-1.5 text-[10px] tabular-nums ${isActive ? "text-foreground" : "text-muted-foreground/60"}`}>
                       {count}

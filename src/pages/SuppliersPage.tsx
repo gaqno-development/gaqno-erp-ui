@@ -22,6 +22,7 @@ import {
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpSuppliers, useCreateErpSupplier } from "@gaqno-development/frontcore";
 import type { ErpSupplier } from "@gaqno-development/types";
+import { formatDate } from "@gaqno-development/frontcore/utils";
 import { Plus, Building2, Mail, Phone, MapPin } from "lucide-react";
 
 export default function SuppliersPage() {
@@ -84,7 +85,7 @@ export default function SuppliersPage() {
         const d = row.getValue("createdAt") as string;
         return d ? (
           <span className="text-sm text-muted-foreground tabular-nums">
-            {new Date(d).toLocaleDateString("pt-BR")}
+            {formatDate(d)}
           </span>
         ) : "—";
       },

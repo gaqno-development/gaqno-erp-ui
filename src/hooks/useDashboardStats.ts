@@ -1,4 +1,5 @@
 import { useERPKPIs } from "@gaqno-development/frontcore";
+import { formatCurrency } from "@gaqno-development/frontcore/utils";
 
 interface DashboardStatCard {
   title: string;
@@ -9,11 +10,6 @@ interface DashboardStatCard {
     isPositive: boolean;
   };
 }
-
-const formatCurrency = (value: number): string =>
-  value
-    .toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-    .replace(/\u00a0/g, " ");
 
 export function useDashboardStats() {
   const { stats, isLoading, error } = useERPKPIs();

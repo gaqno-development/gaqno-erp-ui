@@ -15,8 +15,11 @@ import {
 } from "@gaqno-development/frontcore/components/ui";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { useErpOrders } from "@gaqno-development/frontcore/hooks/erp";
-import { formatCurrency } from "@gaqno-development/frontcore/utils";
-import type { ErpOrderStatus } from "@gaqno-development/types";
+import { formatCurrency, formatRelativeTime } from "@gaqno-development/frontcore/utils";
+import {
+  ERP_ORDER_STATUS_LABEL,
+  ERP_ORDER_STATUS_VARIANT,
+} from "@gaqno-development/frontcore/config/erp-status";
 import {
   ShoppingCart,
   Package,
@@ -30,41 +33,6 @@ import {
   ArrowRight,
   Clock,
 } from "lucide-react";
-
-const ORDER_STATUS_LABEL: Record<string, string> = {
-  pending: "Pendente",
-  confirmed: "Confirmado",
-  processing: "Em processamento",
-  shipped: "Enviado",
-  delivered: "Entregue",
-  cancelled: "Cancelado",
-};
-
-const ORDER_STATUS_VARIANT: Record<string, "secondary" | "default" | "destructive" | "outline"> = {
-  pending: "secondary",
-  confirmed: "outline",
-  processing: "default",
-  shipped: "default",
-  delivered: "default",
-  cancelled: "destructive",
-};
-
-function formatRelativeTime(iso: string): string {
-  try {
-    const now = Date.now();
-    const then = new Date(iso).getTime();
-    const diff = now - then;
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "agora";
-    if (mins < 60) return `${mins}min atrás`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h atrás`;
-    const days = Math.floor(hours / 24);
-    return `${days}d atrás`;
-  } catch {
-    return "";
-  }
-}
 
 const ICON_MAP: Record<string, typeof Package> = {
   "Total de Produtos": Package,
@@ -155,8 +123,8 @@ export default function DashboardPage() {
                           </p>
                         </div>
                         <div className="text-right shrink-0 flex items-center gap-2">
-                          <Badge variant={ORDER_STATUS_VARIANT[order.status] ?? "secondary"} className="text-[10px]">
-                            {ORDER_STATUS_LABEL[order.status] ?? order.status}
+                          <Badge variant={ERP_ORDER_STATUS_VARIANT[order.status as keyof typeof ERP_ORDER_STATUS_VARIANT] ?? "secondary"} className="text-[10px]">
+                            {ERP_ORDER_STATUS_LABEL[order.status as keyof typeof ERP_ORDER_STATUS_LABEL] ?? order.status}
                           </Badge>
                           <span className="text-sm font-medium tabular-nums">
                             {formatCurrency(Number.isNaN(total) ? 0 : total)}
