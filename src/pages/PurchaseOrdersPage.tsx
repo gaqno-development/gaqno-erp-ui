@@ -96,7 +96,7 @@ export default function PurchaseOrdersPage() {
           <p className="text-sm text-muted-foreground mt-1">
             {query.isLoading
               ? "Carregando…"
-              : `${count} ordem${count !== 1 ? "ns" : ""} de compra`}
+              : `${count} ${count !== 1 ? "ordens" : "ordem"} de compra`}
           </p>
         </div>
       </AnimatedEntry>
