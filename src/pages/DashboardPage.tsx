@@ -17,6 +17,9 @@ import {
   TrendingUp,
   Sparkles,
   LayoutDashboard,
+  Building2,
+  ClipboardList,
+  Truck,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -63,6 +66,9 @@ export default function DashboardPage() {
           { to: "/erp/catalog", label: "Catálogo", icon: Package, variant: "default" },
           { to: "/erp/orders", label: "Pedidos", icon: ShoppingCart },
           { to: "/erp/inventory", label: "Estoque", icon: Warehouse },
+          { to: "/erp/suppliers", label: "Fornecedores", icon: Building2 },
+          { to: "/erp/purchasing", label: "Compras", icon: ClipboardList },
+          { to: "/erp/logistics", label: "Logística", icon: Truck },
           { to: "/erp/ai-content", label: "Conteúdo de IA", icon: Sparkles },
         ]}
       />
@@ -71,8 +77,7 @@ export default function DashboardPage() {
         <CardHeader>
           <CardTitle>Atividade recente</CardTitle>
           <CardDescription>
-            Pedidos recentes e mudanças de estoque aparecerão aqui quando a API
-            de pedidos estiver disponível
+            Últimos pedidos e movimentações de estoque
           </CardDescription>
         </CardHeader>
         <CardContent>
