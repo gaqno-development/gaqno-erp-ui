@@ -22,6 +22,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  AnimatedEntry,
+  Badge,
 } from "@gaqno-development/frontcore/components/ui";
 import {
   useERPInventory,
@@ -32,7 +34,19 @@ import {
 } from "@gaqno-development/frontcore";
 import type { ErpStockMovement, StockMovementType } from "@gaqno-development/types";
 import { LowStockAlert } from "../components/LowStockAlert";
-import { Plus, ArrowDownToLine, ArrowUpFromLine, RefreshCw, ArrowLeftRight } from "lucide-react";
+import {
+  Plus,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  RefreshCw,
+  ArrowLeftRight,
+  Warehouse,
+  BarChart3,
+  TrendingDown,
+  AlertTriangle,
+  TrendingUp,
+  ExternalLink,
+} from "lucide-react";
 
 const MOVEMENT_TYPE_LABELS: Record<StockMovementType, string> = {
   inbound: "Entrada",
@@ -47,6 +61,38 @@ const MOVEMENT_TYPE_ICONS: Record<StockMovementType, typeof ArrowDownToLine> = {
   adjustment: RefreshCw,
   transfer: ArrowLeftRight,
 };
+
+const MOVEMENT_TYPE_COLORS: Record<StockMovementType, string> = {
+  inbound: "text-emerald-600 dark:text-emerald-400",
+  outbound: "text-red-600 dark:text-red-400",
+  adjustment: "text-blue-600 dark:text-blue-400",
+  transfer: "text-violet-600 dark:text-violet-400",
+};
+
+function StockBadge({ stock, isLow }: { stock: number; isLow: boolean }) {
+  if (stock === 0) {
+    return (
+      <span className="flex items-center gap-1 text-xs font-medium text-destructive">
+        <AlertTriangle className="h-3 w-3" />
+        Sem estoque
+      </span>
+    );
+  }
+  if (isLow) {
+    return (
+      <span className="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+        <TrendingDown className="h-3 w-3" />
+        {stock} un.
+      </span>
+    );
+  }
+  return (
+    <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+      <TrendingUp className="h-3 w-3" />
+      {stock} un.
+    </span>
+  );
+}
 
 export default function InventoryPage() {
   const { inventory, isLoading: isLoadingProducts } = useERPInventory({ limit: 200 });
@@ -91,26 +137,31 @@ export default function InventoryPage() {
   };
 
   const stockColumns: ColumnDef<any>[] = [
-    { accessorKey: "name", header: "Produto" },
+    {
+      accessorKey: "name",
+      header: "Produto",
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("name")}</span>
+      ),
+    },
     {
       accessorKey: "stock",
       header: "Estoque",
       cell: ({ row }) => {
         const stock = row.getValue("stock") as number;
         const isLow = lowStock.some((p: any) => p.id === row.original.id);
-        return (
-          <span className={isLow ? "text-amber-600 dark:text-amber-400 font-medium" : ""}>
-            {stock}
-          </span>
-        );
+        return <StockBadge stock={stock} isLow={isLow} />;
       },
     },
     {
       id: "actions",
       cell: ({ row }) => (
         <div className="text-right">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to={`/erp/catalog/${row.original.id}`}>Ver</Link>
+          <Button variant="ghost" size="sm" asChild className="group">
+            <Link to={`/erp/catalog/${row.original.id}`}>
+              <ExternalLink className="h-3 w-3 mr-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+              Ver
+            </Link>
           </Button>
         </div>
       ),
@@ -124,16 +175,31 @@ export default function InventoryPage() {
       cell: ({ row }) => {
         const type = row.getValue("type") as StockMovementType;
         const Icon = MOVEMENT_TYPE_ICONS[type] ?? RefreshCw;
+        const color = MOVEMENT_TYPE_COLORS[type] ?? "";
         return (
-          <span className="flex items-center gap-1.5 text-sm">
+          <span className={`flex items-center gap-1.5 text-sm font-medium ${color}`}>
             <Icon className="h-3.5 w-3.5" />
             {MOVEMENT_TYPE_LABELS[type] ?? type}
           </span>
         );
       },
     },
-    { accessorKey: "quantity", header: "Qtd" },
-    { accessorKey: "productId", header: "Produto ID" },
+    {
+      accessorKey: "quantity",
+      header: "Qtd",
+      cell: ({ row }) => (
+        <span className="tabular-nums font-medium">{row.getValue("quantity")}</span>
+      ),
+    },
+    {
+      accessorKey: "productId",
+      header: "Produto",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs text-muted-foreground">
+          {(row.getValue("productId") as string).slice(0, 8)}
+        </span>
+      ),
+    },
     {
       accessorKey: "reference",
       header: "Referência",
@@ -144,128 +210,143 @@ export default function InventoryPage() {
       header: "Data",
       cell: ({ row }) => {
         const d = row.getValue("createdAt") as string;
-        return d ? new Date(d).toLocaleDateString("pt-BR") : "—";
+        return d ? (
+          <span className="text-sm text-muted-foreground tabular-nums">
+            {new Date(d).toLocaleDateString("pt-BR")}
+          </span>
+        ) : "—";
       },
     },
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Gestão de Estoque</h2>
-        <div className="flex gap-2">
-          <Dialog open={warehouseDialogOpen} onOpenChange={setWarehouseDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-1" /> Depósito
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Novo depósito</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleCreateWarehouse} className="space-y-4 mt-2">
-                <div className="space-y-2">
-                  <Label htmlFor="wh-name">Nome</Label>
-                  <Input
-                    id="wh-name"
-                    value={warehouseName}
-                    onChange={(e) => setWarehouseName(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button type="submit" disabled={createWarehouse.isPending}>
-                  {createWarehouse.isPending ? "Criando…" : "Criar"}
+      <AnimatedEntry direction="fade" duration={0.2}>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-muted-foreground" />
+              Gestão de Estoque
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Movimentações, níveis de estoque e depósitos
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Dialog open={warehouseDialogOpen} onOpenChange={setWarehouseDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="group">
+                  <Plus className="h-4 w-4 mr-1 transition-transform group-hover:rotate-90" />
+                  Depósito
                 </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={movementDialogOpen} onOpenChange={setMovementDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-1" /> Movimentação
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nova movimentação</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleCreateMovement} className="space-y-4 mt-2">
-                <div className="space-y-2">
-                  <Label htmlFor="mv-product">Produto</Label>
-                  <Select
-                    value={movementForm.productId}
-                    onValueChange={(v) => setMovementForm((f) => ({ ...f, productId: v }))}
-                  >
-                    <SelectTrigger id="mv-product">
-                      <SelectValue placeholder="Selecione o produto" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {withStock.map((p: any) => (
-                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Novo depósito</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleCreateWarehouse} className="space-y-4 mt-2">
                   <div className="space-y-2">
-                    <Label htmlFor="mv-type">Tipo</Label>
+                    <Label htmlFor="wh-name">Nome</Label>
+                    <Input id="wh-name" value={warehouseName} onChange={(e) => setWarehouseName(e.target.value)} required className="h-10" />
+                  </div>
+                  <Button type="submit" disabled={createWarehouse.isPending}>
+                    {createWarehouse.isPending ? "Criando…" : "Criar"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={movementDialogOpen} onOpenChange={setMovementDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="group">
+                  <Plus className="h-4 w-4 mr-1 transition-transform group-hover:rotate-90" />
+                  Movimentação
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Nova movimentação</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleCreateMovement} className="space-y-4 mt-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="mv-product">Produto</Label>
                     <Select
-                      value={movementForm.type}
-                      onValueChange={(v) => setMovementForm((f) => ({ ...f, type: v as StockMovementType }))}
+                      value={movementForm.productId}
+                      onValueChange={(v) => setMovementForm((f) => ({ ...f, productId: v }))}
                     >
-                      <SelectTrigger id="mv-type">
-                        <SelectValue />
+                      <SelectTrigger id="mv-product" className="h-10">
+                        <SelectValue placeholder="Selecione o produto" />
                       </SelectTrigger>
                       <SelectContent>
-                        {(Object.entries(MOVEMENT_TYPE_LABELS) as [StockMovementType, string][]).map(
-                          ([val, label]) => (
-                            <SelectItem key={val} value={val}>{label}</SelectItem>
-                          ),
-                        )}
+                        {withStock.map((p: any) => (
+                          <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="mv-type">Tipo</Label>
+                      <Select
+                        value={movementForm.type}
+                        onValueChange={(v) => setMovementForm((f) => ({ ...f, type: v as StockMovementType }))}
+                      >
+                        <SelectTrigger id="mv-type" className="h-10">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.entries(MOVEMENT_TYPE_LABELS) as [StockMovementType, string][]).map(
+                            ([val, label]) => (
+                              <SelectItem key={val} value={val}>{label}</SelectItem>
+                            ),
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="mv-qty">Quantidade</Label>
+                      <Input
+                        id="mv-qty"
+                        type="number"
+                        min={1}
+                        value={movementForm.quantity}
+                        onChange={(e) => setMovementForm((f) => ({ ...f, quantity: e.target.value }))}
+                        required
+                        className="h-10 tabular-nums"
+                      />
+                    </div>
+                  </div>
                   <div className="space-y-2">
-                    <Label htmlFor="mv-qty">Quantidade</Label>
+                    <Label htmlFor="mv-ref">Referência</Label>
                     <Input
-                      id="mv-qty"
-                      type="number"
-                      min={1}
-                      value={movementForm.quantity}
-                      onChange={(e) => setMovementForm((f) => ({ ...f, quantity: e.target.value }))}
-                      required
+                      id="mv-ref"
+                      value={movementForm.reference}
+                      onChange={(e) => setMovementForm((f) => ({ ...f, reference: e.target.value }))}
+                      placeholder="Ex: NF-123"
+                      className="h-10"
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="mv-ref">Referência</Label>
-                  <Input
-                    id="mv-ref"
-                    value={movementForm.reference}
-                    onChange={(e) => setMovementForm((f) => ({ ...f, reference: e.target.value }))}
-                    placeholder="Ex: NF-123"
-                  />
-                </div>
-                <Button type="submit" disabled={createMovement.isPending}>
-                  {createMovement.isPending ? "Registrando…" : "Registrar"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <Button type="submit" disabled={createMovement.isPending}>
+                    {createMovement.isPending ? "Registrando…" : "Registrar"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-      </div>
+      </AnimatedEntry>
 
-      <LowStockAlert products={lowStock} />
+      <AnimatedEntry direction="up" delay={0.05}>
+        <LowStockAlert products={lowStock} />
+      </AnimatedEntry>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <AnimatedEntry direction="up" delay={0.1} className="lg:col-span-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Movimentações recentes</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Movimentações recentes</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <DataTable
                 columns={movementColumns}
                 data={{ data: movementsQuery.data ?? [], isLoading: movementsQuery.isLoading }}
@@ -274,13 +355,14 @@ export default function InventoryPage() {
               />
             </CardContent>
           </Card>
-        </div>
-        <div className="space-y-6">
+        </AnimatedEntry>
+
+        <AnimatedEntry direction="up" delay={0.2} className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Níveis de estoque</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Níveis de estoque</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <DataTable
                 columns={stockColumns}
                 data={{ data: withStock, isLoading: isLoadingProducts }}
@@ -289,25 +371,41 @@ export default function InventoryPage() {
               />
             </CardContent>
           </Card>
+
           <Card>
-            <CardHeader>
-              <CardTitle>Depósitos</CardTitle>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Depósitos</CardTitle>
+                <Badge variant="secondary" className="text-[10px]">
+                  {(warehousesQuery.data ?? []).length}
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
               {warehousesQuery.isLoading ? (
-                <p className="text-sm text-muted-foreground">Carregando…</p>
+                <div className="space-y-2">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <div key={i} className="h-8 bg-muted/50 rounded animate-pulse" />
+                  ))}
+                </div>
               ) : (warehousesQuery.data ?? []).length === 0 ? (
-                <p className="text-sm text-muted-foreground">Nenhum depósito cadastrado.</p>
+                <div className="py-4 text-center">
+                  <Warehouse className="h-6 w-6 text-muted-foreground/30 mx-auto mb-1.5" />
+                  <p className="text-xs text-muted-foreground">Nenhum depósito cadastrado</p>
+                </div>
               ) : (
-                <ul className="space-y-1">
+                <ul className="space-y-1.5">
                   {(warehousesQuery.data ?? []).map((w) => (
-                    <li key={w.id} className="text-sm">{w.name}</li>
+                    <li key={w.id} className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-muted/50 transition-colors">
+                      <Warehouse className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-sm font-medium">{w.name}</span>
+                    </li>
                   ))}
                 </ul>
               )}
             </CardContent>
           </Card>
-        </div>
+        </AnimatedEntry>
       </div>
     </div>
   );
