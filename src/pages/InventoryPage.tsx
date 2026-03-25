@@ -12,6 +12,7 @@ import {
   ColumnDef,
   Input,
   Label,
+  Textarea,
   Select,
   SelectContent,
   SelectItem,
@@ -70,8 +71,10 @@ const MOVEMENT_TYPE_COLORS: Record<StockMovementType, string> = {
 
 
 export default function InventoryPage() {
-  const { inventory, isLoading: isLoadingProducts } = useERPInventory({ limit: 200 });
+  const inventoryQuery = useERPInventory({ limit: 200 });
+  const { inventory, isLoading: isLoadingProducts } = inventoryQuery;
   const { withStock, lowStock } = inventory;
+  const allProducts = inventoryQuery.data ?? [];
   const movementsQuery = useStockMovements({ limit: 100 });
   const warehousesQuery = useWarehouses();
   const createMovement = useCreateStockMovement();
@@ -252,7 +255,7 @@ export default function InventoryPage() {
                         <SelectValue placeholder="Selecione o produto" />
                       </SelectTrigger>
                       <SelectContent>
-                        {withStock.map((p: any) => (
+                        {allProducts.map((p) => (
                           <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                         ))}
                       </SelectContent>
@@ -298,6 +301,16 @@ export default function InventoryPage() {
                       onChange={(e) => setMovementForm((f) => ({ ...f, reference: e.target.value }))}
                       placeholder="Ex: NF-123"
                       className="h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="mv-notes">Observações</Label>
+                    <Textarea
+                      id="mv-notes"
+                      value={movementForm.notes}
+                      onChange={(e) => setMovementForm((f) => ({ ...f, notes: e.target.value }))}
+                      placeholder="Opcional"
+                      className="min-h-[80px] resize-y"
                     />
                   </div>
                   <Button type="submit" disabled={createMovement.isPending}>

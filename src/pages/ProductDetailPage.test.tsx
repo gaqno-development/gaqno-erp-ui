@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import { render } from "@/test/test-utils";
-import { useErpProducts as mockUseErpProducts } from "@/__mocks__/frontcore";
+import { useErpProduct as mockUseErpProduct } from "@/__mocks__/frontcore";
 import ProductDetailPage from "./ProductDetailPage";
 
 vi.mock("@gaqno-development/frontcore", async () => {
@@ -26,16 +26,16 @@ vi.mock("@gaqno-development/frontcore/components/ai", async () => {
 describe("ProductDetailPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseErpProducts.mockReturnValue({ data: [], isLoading: false });
+    mockUseErpProduct.mockReturnValue({ data: undefined, isLoading: false });
   });
 
   it("should show loading when products are loading", () => {
-    mockUseErpProducts.mockReturnValue({ data: undefined, isLoading: true });
+    mockUseErpProduct.mockReturnValue({ data: undefined, isLoading: true });
     render(<ProductDetailPage />, {
       routerProps: { initialEntries: ["/erp/catalog/1"] },
       routePath: "/erp/catalog/:id",
     });
-    expect(screen.getByTestId("product-loading")).toBeInTheDocument();
+    expect(screen.getByTestId("product-detail-fallback")).toBeInTheDocument();
   });
 
   it("should show product not found when id does not match", () => {
@@ -47,10 +47,8 @@ describe("ProductDetailPage", () => {
   });
 
   it("should show product name and actions when product exists", () => {
-    mockUseErpProducts.mockReturnValue({
-      data: [
-        { id: "1", name: "Test Product", price: 99, tenantId: "t1", category: "Cat1", stock: 10 },
-      ],
+    mockUseErpProduct.mockReturnValue({
+      data: { id: "1", name: "Test Product", price: 99, tenantId: "t1", category: "Cat1", stock: 10 },
       isLoading: false,
     });
     render(<ProductDetailPage />, {

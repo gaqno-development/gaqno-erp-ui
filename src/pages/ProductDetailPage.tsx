@@ -19,7 +19,7 @@ import {
   DetailRow,
   StockIndicator,
 } from "@gaqno-development/frontcore/components/ui";
-import { useErpProducts } from "@gaqno-development/frontcore";
+import { useErpProduct } from "@gaqno-development/frontcore";
 import { formatCurrency } from "@gaqno-development/frontcore/utils";
 import { ERP_PRODUCT_STATUS_THEME } from "@gaqno-development/frontcore/config/erp-status";
 import {
@@ -82,12 +82,10 @@ export default function ProductDetailPage() {
   const [contentSheetOpen, setContentSheetOpen] = useState(false);
   const [videoSheetOpen, setVideoSheetOpen] = useState(false);
 
-  const productsQuery = useErpProducts({ limit: 100 });
-  const products = productsQuery.data ?? [];
-  const found = id ? products.find((p: any) => p.id === id) : undefined;
-  const product = found ?? null;
+  const productQuery = useErpProduct(id);
+  const product = productQuery.data ?? null;
 
-  if (productsQuery.isLoading) {
+  if (productQuery.isLoading) {
     return (
       <div className="space-y-4" data-testid="product-detail-fallback">
         <Button variant="ghost" size="sm" asChild className="group">

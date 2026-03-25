@@ -14,17 +14,21 @@ import {
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpProducts } from "@gaqno-development/frontcore";
 import { useFilteredCatalog } from "../hooks/useFilteredCatalog";
-import { Plus, Search, Package, SlidersHorizontal, LayoutGrid } from "lucide-react";
+import { AlertCircle, Plus, Search, Package, SlidersHorizontal, LayoutGrid } from "lucide-react";
 import {
-  LoadingSkeleton,
   EmptyState,
   ProductCard,
+  Skeleton,
+  Card,
+  CardContent,
 } from "@gaqno-development/frontcore/components/ui";
 
 export default function CatalogPage() {
   const navigate = useNavigate();
   const productsQuery = useErpProducts({ limit: 200 });
   const products = productsQuery.data ?? [];
+  const isError = productsQuery.isError;
+  const refetchProducts = productsQuery.refetch;
   const {
     search,
     setSearch,
@@ -108,9 +112,35 @@ export default function CatalogPage() {
         </div>
       </AnimatedEntry>
 
-      {isLoading ? (
+      {isError ? (
+        <div className="flex flex-col items-center justify-center gap-3 py-12">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <p className="text-sm text-muted-foreground">Erro ao carregar dados</p>
+          <Button variant="outline" size="sm" onClick={() => refetchProducts()}>
+            Tentar novamente
+          </Button>
+        </div>
+      ) : isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          <LoadingSkeleton count={10} variant="card" />
+          {Array.from({ length: 10 }).map((_, i) => (
+            <Card key={i} className="overflow-hidden">
+              <Skeleton className="aspect-square w-full" />
+              <CardContent className="p-3 space-y-2">
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-4/5" />
+                  <Skeleton className="h-3 w-1/3" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-20" />
+                  <Skeleton className="h-4 w-14 rounded-full" />
+                </div>
+                <div className="flex items-center justify-between pt-1 border-t border-border/50">
+                  <Skeleton className="h-3 w-12" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       ) : filteredProducts.length === 0 ? (
         <AnimatedEntry direction="fade" delay={0.1}>

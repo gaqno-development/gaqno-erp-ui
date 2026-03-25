@@ -1,15 +1,22 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import {
   Card,
   CardContent,
+  Button,
   DataTable,
   ColumnDef,
+  EmptyState,
+  LoadingSkeleton,
   Badge,
   AnimatedEntry,
-  EmptyState,
+  SearchField,
 } from "@gaqno-development/frontcore/components/ui";
-import { useErpPurchaseOrders } from "@gaqno-development/frontcore";
+import {
+  useErpPurchaseOrders,
+  useErpSuppliers,
+} from "@gaqno-development/frontcore/hooks/erp";
 import { formatCurrency, formatDate } from "@gaqno-development/frontcore/utils";
 import {
   ERP_PURCHASE_ORDER_STATUS_LABEL,
@@ -19,90 +26,141 @@ import type { ErpPurchaseOrder, ErpPurchaseOrderStatus } from "@gaqno-developmen
 import { ClipboardList } from "lucide-react";
 
 export default function PurchaseOrdersPage() {
-  const query = useErpPurchaseOrders({ limit: 100 });
+  const [search, setSearch] = useState("");
+  const poQuery = useErpPurchaseOrders({ limit: 200 });
+  const suppliersQuery = useErpSuppliers();
+  const purchaseOrders = poQuery.data ?? [];
+  const isLoading = poQuery.isLoading;
+
+  const supplierNameById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const s of suppliersQuery.data ?? []) {
+      m.set(s.id, s.name);
+    }
+    return m;
+  }, [suppliersQuery.data]);
+
+  const filteredOrders = useMemo(() => {
+    if (!search.trim()) return purchaseOrders;
+    const s = search.toLowerCase();
+    return purchaseOrders.filter((o) => {
+      const supName = supplierNameById.get(o.supplierId) ?? "";
+      return (
+        o.id.toLowerCase().includes(s) ||
+        supName.toLowerCase().includes(s) ||
+        (o.notes?.toLowerCase().includes(s) ?? false)
+      );
+    });
+  }, [purchaseOrders, search, supplierNameById]);
 
   const columns: ColumnDef<ErpPurchaseOrder>[] = [
     {
       accessorKey: "id",
-      header: "ID",
+      header: "Nº OC",
       cell: ({ row }) => (
-        <span className="font-mono text-xs text-muted-foreground">
-          {(row.getValue("id") as string).slice(0, 8)}
+        <span className="font-mono text-xs text-muted-foreground tabular-nums">
+          {row.original.id.slice(0, 8)}…
         </span>
       ),
+    },
+    {
+      id: "supplier",
+      header: "Fornecedor",
+      cell: ({ row }) => {
+        const name = supplierNameById.get(row.original.supplierId);
+        return (
+          <span className="truncate max-w-[200px] block font-medium" title={name ?? row.original.supplierId}>
+            {name ?? row.original.supplierId.slice(0, 8) + "…"}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-        const s = row.getValue("status") as ErpPurchaseOrderStatus;
-        return <Badge variant={ERP_PURCHASE_ORDER_STATUS_VARIANT[s]}>{ERP_PURCHASE_ORDER_STATUS_LABEL[s] ?? s}</Badge>;
+        const st = row.original.status as ErpPurchaseOrderStatus;
+        return (
+          <Badge variant={ERP_PURCHASE_ORDER_STATUS_VARIANT[st]} className="font-normal">
+            {ERP_PURCHASE_ORDER_STATUS_LABEL[st]}
+          </Badge>
+        );
       },
     },
     {
       accessorKey: "total",
       header: "Total",
-      cell: ({ row }) => (
-        <span className="tabular-nums font-medium">{formatCurrency(Number(row.getValue("total")))}</span>
-      ),
-    },
-    {
-      accessorKey: "expectedDeliveryDate",
-      header: "Entrega prevista",
       cell: ({ row }) => {
-        const d = row.getValue("expectedDeliveryDate") as string | null;
-        return d ? (
-          <span className="text-sm tabular-nums">{formatDate(d)}</span>
-        ) : <span className="text-muted-foreground">—</span>;
+        const t = row.original.total;
+        const num = typeof t === "string" ? parseFloat(t) : t;
+        return (
+          <span className="tabular-nums font-medium">
+            {formatCurrency(Number.isNaN(num) ? 0 : num)}
+          </span>
+        );
       },
     },
     {
       accessorKey: "createdAt",
-      header: "Criado em",
-      cell: ({ row }) => {
-        const d = row.getValue("createdAt") as string;
-        return d ? (
-          <span className="text-sm text-muted-foreground tabular-nums">{formatDate(d)}</span>
-        ) : "—";
-      },
+      header: "Data",
+      cell: ({ row }) => (
+        <span className="text-muted-foreground text-sm tabular-nums">
+          {formatDate(row.original.createdAt)}
+        </span>
+      ),
     },
   ];
-
-  const count = (query.data ?? []).length;
 
   return (
     <div className="space-y-6">
       <AnimatedEntry direction="fade" duration={0.2}>
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-muted-foreground" />
-            Ordens de Compra
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {query.isLoading
-              ? "Carregando…"
-              : `${count} ${count !== 1 ? "ordens" : "ordem"} de compra`}
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight">Compras</h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              Ordens de compra e acompanhamento junto aos fornecedores.
+            </p>
+          </div>
+          <Button size="sm" disabled className="shrink-0">
+            Nova Ordem
+          </Button>
         </div>
+      </AnimatedEntry>
+
+      <AnimatedEntry direction="up" delay={0.05}>
+        <SearchField
+          value={search}
+          onChange={setSearch}
+          placeholder="Buscar por número, fornecedor ou observações…"
+        />
       </AnimatedEntry>
 
       <AnimatedEntry direction="up" delay={0.1}>
         <Card className="border-0 shadow-sm bg-card/50">
           <CardContent className="p-0">
-            {count === 0 && !query.isLoading ? (
+            {isLoading ? (
+              <div className="p-6">
+                <LoadingSkeleton count={8} variant="table" />
+              </div>
+            ) : filteredOrders.length === 0 ? (
               <div className="p-8 sm:p-12">
                 <EmptyState
-                  title="Nenhuma ordem de compra"
-                  description="As ordens de compra aparecerão aqui quando forem criadas."
+                  title={search ? "Nenhuma ordem encontrada" : "Nenhuma ordem de compra ainda"}
+                  description={
+                    search
+                      ? "Tente outro termo de busca."
+                      : "As ordens de compra criadas aparecerão aqui."
+                  }
                   icon={ClipboardList}
                 />
               </div>
             ) : (
               <DataTable
                 columns={columns}
-                data={{ data: query.data ?? [], isLoading: query.isLoading }}
+                data={{ data: filteredOrders, isLoading: false }}
                 initialPageSize={20}
                 cardStyle={false}
+                showPagination={filteredOrders.length > 10}
               />
             )}
           </CardContent>

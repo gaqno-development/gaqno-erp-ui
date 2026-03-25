@@ -23,6 +23,7 @@ export const useUpdateErpProduct = vi.fn(() => ({
 export const useErpOrders = vi.fn(() => ({ data: [], isLoading: false }));
 export const useERPInventory = vi.fn(() => ({
   inventory: { withStock: [], lowStock: [] },
+  data: [],
   isLoading: false,
 }));
 export const useStockMovements = vi.fn(() => ({ data: [], isLoading: false }));
@@ -90,6 +91,10 @@ export const Button = React.forwardRef(
 
 export const Input = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLInputElement>) => (
   <input ref={ref} {...props} />
+));
+
+export const Textarea = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLTextAreaElement>) => (
+  <textarea ref={ref} {...props} />
 ));
 
 export const Select = ({
@@ -179,6 +184,11 @@ const EmptyState = ({ title, description }: { title?: string; description?: Reac
 const LoadingSkeleton = (props: Record<string, unknown>) => <div data-testid="loading-skeleton" {...props} />;
 const ErrorBoundary = ({ children }: { children?: React.ReactNode }) => <>{children}</>;
 
+export const AnimatedEntry = ({ children }: { children?: React.ReactNode }) => <>{children}</>;
+export const Separator = () => <div data-testid="separator" role="separator" />;
+export const Skeleton = (props: Record<string, unknown>) => <div data-testid="skeleton" {...props} />;
+export const StockIndicator = ({ stock }: { stock?: number }) => <span data-testid="stock-indicator">{stock ?? 0}</span>;
+
 export const components = {
   ui: {
     Card: Div,
@@ -188,6 +198,7 @@ export const components = {
     CardTitle: ({ children, ...p }: { children?: React.ReactNode }) => <h3 {...p}>{children}</h3>,
     Button,
     Input,
+    Textarea,
     Select,
     SelectContent,
     SelectItem,
@@ -216,6 +227,10 @@ export const components = {
     DialogTitle,
     DialogTrigger,
     Badge,
+    AnimatedEntry,
+    Separator,
+    Skeleton,
+    StockIndicator,
     ColumnDef: {} as any,
   },
 };

@@ -94,7 +94,8 @@ function StatusTimeline({ currentStatus }: { currentStatus: ErpOrderStatus }) {
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const ordersQuery = useErpOrders({ limit: 200 });
+  // TODO: useErpOrder(id) when frontcore exposes GET /orders/:id
+  const ordersQuery = useErpOrders({ limit: 10_000 });
   const orders = ordersQuery.data ?? [];
   const order = id ? orders.find((o) => o.id === id) : undefined;
 

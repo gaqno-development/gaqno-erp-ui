@@ -43,14 +43,16 @@ describe("InventoryPage", () => {
   });
 
   it("should show table when inventory has stock", () => {
+    const items = [
+      { id: "1", name: "Item A", price: 10, tenantId: "t1", category: "C1", stock: 3 },
+      { id: "2", name: "Item B", price: 20, tenantId: "t1", category: "C1", stock: 50 },
+    ];
     mockUseERPInventory.mockReturnValue({
       inventory: {
-        withStock: [
-          { id: "1", name: "Item A", price: 10, tenantId: "t1", category: "C1", stock: 3 },
-          { id: "2", name: "Item B", price: 20, tenantId: "t1", category: "C1", stock: 50 },
-        ],
+        withStock: items,
         lowStock: [{ id: "1", name: "Item A", stock: 3 }],
       },
+      data: items,
       isLoading: false,
     });
     render(<InventoryPage />);

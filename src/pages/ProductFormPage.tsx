@@ -11,6 +11,7 @@ import {
   Button,
   Input,
   Label,
+  Textarea,
   Select,
   SelectContent,
   SelectItem,
@@ -90,6 +91,8 @@ export default function ProductFormPage() {
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState<ProductStatus>("active");
   const [saved, setSaved] = useState(false);
+  const [priceError, setPriceError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (product) {
@@ -112,38 +115,46 @@ export default function ProductFormPage() {
   }, [product, isEdit]);
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
-  const submitError = createMutation.error ?? updateMutation.error;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPriceError(null);
+    setSaveError(null);
     const numPrice = parseFloat(price);
     const numStock = stock === "" ? undefined : parseInt(stock, 10);
-    if (Number.isNaN(numPrice) || numPrice < 0) return;
+    if (Number.isNaN(numPrice) || numPrice < 0) {
+      setPriceError("Informe um preço válido (número maior ou igual a zero).");
+      return;
+    }
 
-    if (isEdit && id) {
-      const updated = await updateMutation.mutateAsync({
-        name: name.trim() || undefined,
-        description: description.trim() || undefined,
-        sku: sku.trim() || undefined,
-        price: numPrice,
-        stock: numStock,
-        category: category.trim() || undefined,
-        status,
-      });
-      setSaved(true);
-      setTimeout(() => navigate(`/erp/catalog/${updated.id}`), 600);
-    } else {
-      const created = await createMutation.mutateAsync({
-        name: name.trim(),
-        description: description.trim() || undefined,
-        sku: sku.trim() || undefined,
-        price: numPrice,
-        stock: numStock,
-        category: category.trim() || undefined,
-        status,
-      });
-      setSaved(true);
-      setTimeout(() => navigate(`/erp/catalog/${created.id}`), 600);
+    try {
+      if (isEdit && id) {
+        const updated = await updateMutation.mutateAsync({
+          name: name.trim() || undefined,
+          description: description.trim() || undefined,
+          sku: sku.trim() || undefined,
+          price: numPrice,
+          stock: numStock,
+          category: category.trim() || undefined,
+          status,
+        });
+        setSaved(true);
+        setTimeout(() => navigate(`/erp/catalog/${updated.id}`), 600);
+      } else {
+        const created = await createMutation.mutateAsync({
+          name: name.trim(),
+          description: description.trim() || undefined,
+          sku: sku.trim() || undefined,
+          price: numPrice,
+          stock: numStock,
+          category: category.trim() || undefined,
+          status,
+        });
+        setSaved(true);
+        setTimeout(() => navigate(`/erp/catalog/${created.id}`), 600);
+      }
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Não foi possível salvar o produto. Tente novamente.");
     }
   };
 
@@ -233,12 +244,12 @@ export default function ProductFormPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Descrição</Label>
-                <Input
+                <Textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Breve descrição do produto"
-                  className="h-10"
+                  className="min-h-[100px] resize-y"
                 />
               </div>
             </CardContent>
@@ -286,11 +297,20 @@ export default function ProductFormPage() {
                     min={0}
                     step="0.01"
                     value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+                    onChange={(e) => {
+                      setPrice(e.target.value);
+                      setPriceError(null);
+                    }}
                     placeholder="0,00"
                     required
                     className="h-10 tabular-nums"
+                    aria-invalid={priceError ? true : undefined}
                   />
+                  {priceError ? (
+                    <p className="text-sm text-destructive" role="alert">
+                      {priceError}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="stock">Estoque inicial</Label>
@@ -336,13 +356,11 @@ export default function ProductFormPage() {
           </Card>
         </FormSection>
 
-        {submitError && (
+        {saveError && (
           <AnimatedEntry direction="fade">
             <Card className="border-destructive/50 bg-destructive/5">
               <CardContent className="py-3">
-                <p className="text-sm text-destructive">
-                  {submitError instanceof Error ? submitError.message : "Erro ao salvar o produto."}
-                </p>
+                <p className="text-sm text-destructive">{saveError}</p>
               </CardContent>
             </Card>
           </AnimatedEntry>
