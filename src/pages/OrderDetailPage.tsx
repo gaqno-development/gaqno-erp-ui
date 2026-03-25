@@ -13,7 +13,7 @@ import {
   CopyableId,
   DetailRow,
 } from "@gaqno-development/frontcore/components/ui";
-import { useErpOrders } from "@gaqno-development/frontcore/hooks/erp";
+import { useErpOrder } from "@gaqno-development/frontcore/hooks/erp";
 import { formatCurrency, formatDateTime } from "@gaqno-development/frontcore/utils";
 import {
   ERP_ORDER_STATUS_LABEL,
@@ -94,12 +94,10 @@ function StatusTimeline({ currentStatus }: { currentStatus: ErpOrderStatus }) {
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
-  // TODO: useErpOrder(id) when frontcore exposes GET /orders/:id
-  const ordersQuery = useErpOrders({ limit: 10_000 });
-  const orders = ordersQuery.data ?? [];
-  const order = id ? orders.find((o) => o.id === id) : undefined;
+  const orderQuery = useErpOrder(id);
+  const order = orderQuery.data;
 
-  if (ordersQuery.isLoading) {
+  if (orderQuery.isLoading) {
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" asChild className="group">
@@ -114,6 +112,29 @@ export default function OrderDetailPage() {
           <Skeleton className="h-32 w-full rounded-xl" />
         </div>
       </div>
+    );
+  }
+
+  if (orderQuery.isError) {
+    return (
+      <AnimatedEntry direction="fade" className="space-y-6">
+        <Button variant="ghost" size="sm" asChild className="group">
+          <Link to="/erp/orders">
+            <ChevronLeft className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
+            Voltar para pedidos
+          </Link>
+        </Button>
+        <Card className="border-destructive/30">
+          <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
+            <p className="text-destructive text-center" data-testid="order-load-error">
+              Não foi possível carregar o pedido.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => orderQuery.refetch()}>
+              Tentar novamente
+            </Button>
+          </CardContent>
+        </Card>
+      </AnimatedEntry>
     );
   }
 

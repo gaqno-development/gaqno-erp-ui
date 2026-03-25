@@ -46,6 +46,7 @@ import {
   Warehouse,
   BarChart3,
   ExternalLink,
+  AlertCircle,
 } from "lucide-react";
 
 const MOVEMENT_TYPE_LABELS: Record<StockMovementType, string> = {
@@ -79,6 +80,16 @@ export default function InventoryPage() {
   const warehousesQuery = useWarehouses();
   const createMovement = useCreateStockMovement();
   const createWarehouse = useCreateWarehouse();
+
+  const pageError =
+    inventoryQuery.isError ||
+    movementsQuery.isError ||
+    warehousesQuery.isError;
+  const refetchPage = () => {
+    void inventoryQuery.refetch();
+    void movementsQuery.refetch();
+    void warehousesQuery.refetch();
+  };
 
   const [movementForm, setMovementForm] = useState({
     productId: "",
@@ -323,11 +334,23 @@ export default function InventoryPage() {
         </div>
       </AnimatedEntry>
 
-      <AnimatedEntry direction="up" delay={0.05}>
-        <LowStockAlert products={lowStock} />
-      </AnimatedEntry>
+      {pageError && (
+        <div className="flex flex-col items-center justify-center gap-3 py-12 rounded-lg border border-border">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <p className="text-sm text-muted-foreground">Erro ao carregar dados</p>
+          <Button variant="outline" size="sm" onClick={refetchPage}>
+            Tentar novamente
+          </Button>
+        </div>
+      )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      {!pageError && (
+        <>
+          <AnimatedEntry direction="up" delay={0.05}>
+            <LowStockAlert products={lowStock} />
+          </AnimatedEntry>
+
+          <div className="grid gap-6 lg:grid-cols-3">
         <AnimatedEntry direction="up" delay={0.1} className="lg:col-span-2">
           <Card>
             <CardHeader className="pb-3">
@@ -393,7 +416,9 @@ export default function InventoryPage() {
             </CardContent>
           </Card>
         </AnimatedEntry>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

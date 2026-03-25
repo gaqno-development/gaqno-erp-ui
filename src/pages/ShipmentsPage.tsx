@@ -11,11 +11,12 @@ import {
   Badge,
   AnimatedEntry,
   SearchField,
+  Button,
 } from "@gaqno-development/frontcore/components/ui";
 import { useErpCarriers, useErpShipments } from "@gaqno-development/frontcore/hooks/erp";
 import { formatDate } from "@gaqno-development/frontcore/utils";
 import type { ErpShipment, ErpShipmentStatus } from "@gaqno-development/types";
-import { Truck } from "lucide-react";
+import { AlertCircle, Truck } from "lucide-react";
 
 const ERP_SHIPMENT_STATUS_LABEL: Record<ErpShipmentStatus, string> = {
   preparing: "Preparando",
@@ -50,6 +51,12 @@ export default function ShipmentsPage() {
     }
     return m;
   }, [carriersQuery.data]);
+
+  const listError = shipmentsQuery.isError || carriersQuery.isError;
+  const refetchList = () => {
+    void shipmentsQuery.refetch();
+    void carriersQuery.refetch();
+  };
 
   const filteredShipments = useMemo(() => {
     if (!search.trim()) return shipments;
@@ -143,7 +150,15 @@ export default function ShipmentsPage() {
       <AnimatedEntry direction="up" delay={0.1}>
         <Card className="border-0 shadow-sm bg-card/50">
           <CardContent className="p-0">
-            {isLoading ? (
+            {listError ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-12">
+                <AlertCircle className="h-8 w-8 text-destructive" />
+                <p className="text-sm text-muted-foreground">Erro ao carregar dados</p>
+                <Button variant="outline" size="sm" onClick={refetchList}>
+                  Tentar novamente
+                </Button>
+              </div>
+            ) : isLoading ? (
               <div className="p-6">
                 <LoadingSkeleton count={8} variant="table" />
               </div>

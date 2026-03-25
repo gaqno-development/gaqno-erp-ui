@@ -23,7 +23,7 @@ import {
   ERP_PURCHASE_ORDER_STATUS_VARIANT,
 } from "@gaqno-development/frontcore/config/erp-status";
 import type { ErpPurchaseOrder, ErpPurchaseOrderStatus } from "@gaqno-development/types";
-import { ClipboardList } from "lucide-react";
+import { AlertCircle, ClipboardList } from "lucide-react";
 
 export default function PurchaseOrdersPage() {
   const [search, setSearch] = useState("");
@@ -39,6 +39,12 @@ export default function PurchaseOrdersPage() {
     }
     return m;
   }, [suppliersQuery.data]);
+
+  const listError = poQuery.isError || suppliersQuery.isError;
+  const refetchList = () => {
+    void poQuery.refetch();
+    void suppliersQuery.refetch();
+  };
 
   const filteredOrders = useMemo(() => {
     if (!search.trim()) return purchaseOrders;
@@ -138,7 +144,15 @@ export default function PurchaseOrdersPage() {
       <AnimatedEntry direction="up" delay={0.1}>
         <Card className="border-0 shadow-sm bg-card/50">
           <CardContent className="p-0">
-            {isLoading ? (
+            {listError ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-12">
+                <AlertCircle className="h-8 w-8 text-destructive" />
+                <p className="text-sm text-muted-foreground">Erro ao carregar dados</p>
+                <Button variant="outline" size="sm" onClick={refetchList}>
+                  Tentar novamente
+                </Button>
+              </div>
+            ) : isLoading ? (
               <div className="p-6">
                 <LoadingSkeleton count={8} variant="table" />
               </div>

@@ -32,6 +32,7 @@ import {
   Truck,
   ArrowRight,
   Clock,
+  AlertCircle,
 } from "lucide-react";
 
 const ICON_MAP: Record<string, typeof Package> = {
@@ -42,7 +43,7 @@ const ICON_MAP: Record<string, typeof Package> = {
 };
 
 export default function DashboardPage() {
-  const { statCards, isLoading } = useDashboardStats();
+  const { statCards, isLoading, isError: isStatsError, refetch: refetchStats } = useDashboardStats();
   const ordersQuery = useErpOrders({ limit: 5 });
   const recentOrders = ordersQuery.data ?? [];
 
@@ -57,20 +58,30 @@ export default function DashboardPage() {
         </div>
       </AnimatedEntry>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((card, index) => (
-          <AnimatedEntry key={card.title} direction="up" delay={index * 0.06}>
-            <StatCard
-              title={card.title}
-              value={card.value}
-              icon={ICON_MAP[card.title]}
-              isLoading={isLoading}
-              description={card.description}
-              trend={card.trend}
-            />
-          </AnimatedEntry>
-        ))}
-      </div>
+      {isStatsError ? (
+        <div className="flex flex-col items-center justify-center gap-3 py-12 rounded-lg border border-border">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <p className="text-sm text-muted-foreground">Erro ao carregar dados</p>
+          <Button variant="outline" size="sm" onClick={() => refetchStats()}>
+            Tentar novamente
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {statCards.map((card, index) => (
+            <AnimatedEntry key={card.title} direction="up" delay={index * 0.06}>
+              <StatCard
+                title={card.title}
+                value={card.value}
+                icon={ICON_MAP[card.title]}
+                isLoading={isLoading}
+                description={card.description}
+                trend={card.trend}
+              />
+            </AnimatedEntry>
+          ))}
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-5">
         <AnimatedEntry direction="up" delay={0.15} className="lg:col-span-3">
@@ -88,7 +99,15 @@ export default function DashboardPage() {
               </Button>
             </CardHeader>
             <CardContent>
-              {ordersQuery.isLoading ? (
+              {ordersQuery.isError ? (
+                <div className="flex flex-col items-center justify-center gap-3 py-12">
+                  <AlertCircle className="h-8 w-8 text-destructive" />
+                  <p className="text-sm text-muted-foreground">Erro ao carregar dados</p>
+                  <Button variant="outline" size="sm" onClick={() => ordersQuery.refetch()}>
+                    Tentar novamente
+                  </Button>
+                </div>
+              ) : ordersQuery.isLoading ? (
                 <div className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="h-12 bg-muted/50 rounded-lg animate-pulse" />

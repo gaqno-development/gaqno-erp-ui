@@ -12,7 +12,7 @@ interface DashboardStatCard {
 }
 
 export function useDashboardStats() {
-  const { stats, isLoading, error } = useERPKPIs();
+  const { stats, isLoading, isError, refetch, error } = useERPKPIs();
 
   const getStatCards = (): DashboardStatCard[] => {
     return [
@@ -46,6 +46,8 @@ export function useDashboardStats() {
   return {
     statCards: getStatCards(),
     isLoading,
+    isError,
+    refetch,
     error,
     hasLowStock: !isLoading && (stats?.lowStockCount ?? 0) > 0,
   };

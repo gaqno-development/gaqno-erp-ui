@@ -16,7 +16,7 @@ import {
 import { useErpSuppliers } from "@gaqno-development/frontcore/hooks/erp";
 import { formatDate } from "@gaqno-development/frontcore/utils";
 import type { ErpSupplier } from "@gaqno-development/types";
-import { Building2 } from "lucide-react";
+import { AlertCircle, Building2 } from "lucide-react";
 
 export default function SuppliersPage() {
   const [search, setSearch] = useState("");
@@ -108,7 +108,15 @@ export default function SuppliersPage() {
       <AnimatedEntry direction="up" delay={0.1}>
         <Card className="border-0 shadow-sm bg-card/50">
           <CardContent className="p-0">
-            {isLoading ? (
+            {suppliersQuery.isError ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-12">
+                <AlertCircle className="h-8 w-8 text-destructive" />
+                <p className="text-sm text-muted-foreground">Erro ao carregar dados</p>
+                <Button variant="outline" size="sm" onClick={() => suppliersQuery.refetch()}>
+                  Tentar novamente
+                </Button>
+              </div>
+            ) : isLoading ? (
               <div className="p-6">
                 <LoadingSkeleton count={8} variant="table" />
               </div>
