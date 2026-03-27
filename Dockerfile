@@ -11,10 +11,12 @@ RUN if [ -z "$NPM_TOKEN" ] || [ "$NPM_TOKEN" = "REPLACE_WITH_GITHUB_PAT_IN_COOLI
     echo "ERROR: NPM_TOKEN must be set in Coolify Build Arguments (GitHub PAT with read:packages)."; exit 1; \
     fi && \
     printf '%s\n' "@gaqno-development:registry=https://npm.pkg.github.com" "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > .npmrc
-RUN npm config set fetch-timeout 1200000 && \
+RUN --mount=type=cache,target=/root/.npm \
+    npm config set fetch-timeout 1200000 && \
     npm config set fetch-retries 10 && \
-    npm cache clean --force 2>/dev/null; \
     npm install --legacy-peer-deps --include=dev
+ARG GAQNO_CACHE_BUST
+RUN npm update @gaqno-development/frontcore @gaqno-development/types --legacy-peer-deps 2>/dev/null || true
 
 COPY . .
 RUN mkdir -p public
@@ -35,6 +37,10 @@ RUN echo 'server { listen 3004; server_name _; root /usr/share/nginx/html; index
     location /erp/assets/ { alias /usr/share/nginx/html/assets/; add_header Cache-Control "public, immutable"; add_header Access-Control-Allow-Origin "*"; } \
     location /assets/ { alias /usr/share/nginx/html/assets/; add_header Cache-Control "public, immutable"; add_header Access-Control-Allow-Origin "*"; } \
     location / { return 302 /; } }' > /etc/nginx/conf.d/default.conf
+
+RUN mkdir -p /etc/nginx/snippets && \
+    printf 'add_header X-Frame-Options "SAMEORIGIN" always;\nadd_header X-Content-Type-Options "nosniff" always;\nadd_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;\nadd_header Referrer-Policy "strict-origin-when-cross-origin" always;\n' > /etc/nginx/snippets/security-headers.conf && \
+    sed -i 's/server {/server { server_tokens off; include \/etc\/nginx\/snippets\/security-headers.conf;/' /etc/nginx/conf.d/default.conf
 
 EXPOSE 3004
 CMD ["nginx", "-g", "daemon off;"]
