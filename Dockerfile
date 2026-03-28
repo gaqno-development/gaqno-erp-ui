@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/.npm \
     npm config set fetch-retries 10 && \
     npm install --legacy-peer-deps --include=dev
 ARG GAQNO_CACHE_BUST
-RUN npm update @gaqno-development/frontcore @gaqno-development/backcore @gaqno-development/types --legacy-peer-deps 2>/dev/null || true
+RUN npm update @gaqno-development/frontcore @gaqno-development/types --legacy-peer-deps 2>/dev/null || true
 
 COPY . .
 RUN mkdir -p public
