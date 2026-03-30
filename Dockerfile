@@ -7,8 +7,8 @@ WORKDIR /app
 COPY package.json ./
 COPY .npmrc* ./
 ARG NPM_TOKEN
-RUN if [ -z "$NPM_TOKEN" ] || [ "$NPM_TOKEN" = "REPLACE_WITH_GITHUB_PAT_IN_COOLIFY_UI" ]; then \
-    echo "ERROR: NPM_TOKEN must be set in Coolify Build Arguments (GitHub PAT with read:packages)."; exit 1; \
+RUN if [ -z "$NPM_TOKEN" ] || [ "$NPM_TOKEN" = "REPLACE_WITH_NPM_TOKEN" ]; then \
+    echo "ERROR: NPM_TOKEN must be set in Dokploy build arguments (GitHub PAT with read:packages)."; exit 1; \
     fi && \
     printf '%s\n' "@gaqno-development:registry=https://npm.pkg.github.com" "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > .npmrc
 RUN --mount=type=cache,target=/root/.npm \
