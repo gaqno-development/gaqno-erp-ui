@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import { render } from "@/test/test-utils";
@@ -15,8 +16,20 @@ vi.mock("@gaqno-development/frontcore/components/ui", async () => {
 
 vi.mock("@gaqno-development/frontcore/components/layout", async () => {
   const mock = await import("@/__mocks__/frontcore");
-  return { PageLayout: mock.PageLayout };
+  return {
+    PageLayout: mock.PageLayout,
+    MobileBottomNav: () => null,
+  };
 });
+
+vi.mock("@gaqno-development/frontcore/components/glass", () => ({
+  GlassBackground: () => null,
+  GlassTopBar: ({ title }: { title?: string }) => <header>{title}</header>,
+}));
+
+vi.mock("@gaqno-development/frontcore/lib/utils", () => ({
+  cn: (...args: unknown[]) => args.filter(Boolean).join(" "),
+}));
 
 vi.mock("@gaqno-development/frontcore/hooks/ai", () => ({
   useBillingSummary: vi.fn(() => ({ data: null, isLoading: false })),

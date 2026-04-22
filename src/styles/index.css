@@ -1,3 +1,17 @@
 @import "@gaqno-development/frontcore/styles/globals.css";
 @source "../**/*.{js,ts,jsx,tsx}";
 @source "../../index.html";
+
+:root {
+  --erp-accent: hsl(152 48% 36%);
+  --erp-accent-strong: hsl(152 52% 28%);
+  --erp-accent-soft: hsl(152 32% 94%);
+  --erp-accent-ring: hsl(152 48% 36% / 0.32);
+}
+
+.dark {
+  --erp-accent: hsl(152 40% 54%);
+  --erp-accent-strong: hsl(152 44% 62%);
+  --erp-accent-soft: hsl(152 28% 16%);
+  --erp-accent-ring: hsl(152 40% 54% / 0.32);
+}
